@@ -20,15 +20,19 @@ namespace DNA
 
         private void Awake()
         {
+        }
+
+        private void Start()
+        {
             cameraHandler = CameraHandler.singleton;
         }
 
         private void FixedUpdate()
         {
             float delta = Time.fixedDeltaTime;
-
             if (cameraHandler != null)
             {
+                Debug.Log("hey");
                 cameraHandler.FollowTarget(delta);
                 cameraHandler.handleCameraRotation(delta, mouseX, mouseY);
             }

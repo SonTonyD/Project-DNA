@@ -32,6 +32,7 @@ namespace DNA
             defaultPosition = cameraTransform.localPosition.z;
             ignoreLayers = ~(1 << 8 | 1 << 9 | 1 << 10);
             Cursor.lockState = CursorLockMode.Locked;
+            
         }
 
         public void FollowTarget(float delta)
