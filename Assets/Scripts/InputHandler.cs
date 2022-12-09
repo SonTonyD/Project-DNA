@@ -12,15 +12,16 @@ namespace DNA
         public float mouseX;
         public float mouseY;
 
+        public bool a_Input;
+        public bool jumpFlag;
+
+
         PlayerControl inputActions;
         CameraHandler cameraHandler;
 
         Vector2 movementInput;
         Vector2 cameraInput;
 
-        private void Awake()
-        {
-        }
 
         private void Start()
         {
@@ -32,7 +33,6 @@ namespace DNA
             float delta = Time.fixedDeltaTime;
             if (cameraHandler != null)
             {
-                Debug.Log("hey");
                 cameraHandler.FollowTarget(delta);
                 cameraHandler.handleCameraRotation(delta, mouseX, mouseY);
             }
@@ -45,6 +45,7 @@ namespace DNA
                 inputActions = new PlayerControl();
                 inputActions.PlayerMovement.Movement.performed += inputActions => movementInput = inputActions.ReadValue<Vector2>();
                 inputActions.PlayerMovement.Camera.performed += i => cameraInput = i.ReadValue<Vector2>();
+                
             }
 
             inputActions.Enable();
@@ -58,6 +59,7 @@ namespace DNA
         public void TickInput(float delta)
         {
             MoveInput(delta);
+            HandleJumpInput(delta);
         }
 
         private void MoveInput(float delta)
@@ -67,6 +69,20 @@ namespace DNA
             moveAmount = Mathf.Clamp01(Mathf.Abs(horizontal) + Mathf.Abs(vertical));
             mouseX = cameraInput.x;
             mouseY = cameraInput.y;
+        }
+
+        private void HandleJumpInput(float delta)
+        {
+            a_Input = inputActions.PlayerActions.Jump.triggered;
+            if (a_Input)
+            {
+                jumpFlag = true;
+            }
+            else
+            {
+                jumpFlag = false;
+            }
+
         }
 
     }
