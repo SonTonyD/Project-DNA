@@ -15,6 +15,9 @@ namespace DNA
         public bool a_Input;
         public bool jumpFlag;
 
+        public bool leftTrigger_Input;
+        public bool sprintFlag;
+
 
         PlayerControl inputActions;
         CameraHandler cameraHandler;
@@ -60,6 +63,7 @@ namespace DNA
         {
             MoveInput(delta);
             HandleJumpInput(delta);
+            HandleSprintInput(delta);
         }
 
         private void MoveInput(float delta)
@@ -83,6 +87,19 @@ namespace DNA
                 jumpFlag = false;
             }
 
+        }
+
+        private void HandleSprintInput(float delta)
+        {
+            leftTrigger_Input = inputActions.PlayerActions.Sprint.IsPressed();
+            if (leftTrigger_Input)
+            {
+                sprintFlag = true;
+            }
+            else
+            {
+                sprintFlag = false;
+            }
         }
 
     }

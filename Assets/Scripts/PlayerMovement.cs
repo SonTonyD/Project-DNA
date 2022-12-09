@@ -40,6 +40,8 @@ namespace DNA
         float jumpHeight = 4;
         [SerializeField]
         float gravity = -10;
+        [SerializeField]
+        float sprintSpeed = 12;
 
 
 
@@ -106,6 +108,14 @@ namespace DNA
             moveDirection.y = 0;
 
             float speed = movementSpeed;
+
+            if (inputHandler.sprintFlag)
+            {
+                Debug.Log("Je cours");
+                speed = sprintSpeed;
+            }
+            Debug.Log(speed);
+
             moveDirection *= speed;
 
             Vector3 projectedVelocity = Vector3.ProjectOnPlane(moveDirection, normalVector);

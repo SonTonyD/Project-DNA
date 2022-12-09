@@ -378,6 +378,7 @@ MonoBehaviour:
   rotationSpeed: 10
   jumpHeight: 1.8
   gravity: -15
+  sprintSpeed: 20
 --- !u!114 &206747141
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -397,6 +398,8 @@ MonoBehaviour:
   mouseY: 0
   a_Input: 0
   jumpFlag: 0
+  leftTrigger_Input: 0
+  sprintFlag: 0
 --- !u!4 &206747144
 Transform:
   m_ObjectHideFlags: 0
@@ -634,6 +637,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   anim: {fileID: 0}
   canRotate: 1
+  jumpID: 0
+  groundedID: 0
+  freeFallID: 0
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
