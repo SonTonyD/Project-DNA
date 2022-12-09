@@ -20,7 +20,7 @@ namespace DNA
 
         [Header("Stats")]
         [SerializeField]
-        float movementSpeed = 5;
+        float movementSpeed = 8;
         [SerializeField]
         float rotationSpeed = 10;
 
