@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028334, g: 0.2257134, b: 0.30692226, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -372,13 +372,13 @@ MonoBehaviour:
   GroundLayers:
     serializedVersion: 2
     m_Bits: 512
-  GroundedOffset: -0.07
+  GroundedOffset: -0.08
   GroundedRadius: 0.26
   movementSpeed: 8
   rotationSpeed: 10
   jumpHeight: 1.8
   gravity: -15
-  sprintSpeed: 20
+  sprintSpeed: 12
 --- !u!114 &206747141
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -408,7 +408,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 206747139}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 3.18}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -458,7 +458,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 251463553}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.6, z: 0}
+  m_LocalPosition: {x: 0, y: 1.54, z: -0.025}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -515,10 +515,10 @@ MonoBehaviour:
   cameraTransform: {fileID: 963194228}
   cameraPivotTransform: {fileID: 251463554}
   horizontalSensitivity: 0.05
-  followSpeed: 0.1
+  followSpeed: 0.3
   verticalSensibility: 0.05
   minimumPivot: -30
-  maximumPivot: 90
+  maximumPivot: 70
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -716,14 +716,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: -0.09203859, y: -0, z: -0, w: 0.9957555}
+  m_LocalRotation: {x: -0.06975647, y: 0, z: 0, w: 0.9975641}
   m_LocalPosition: {x: 0, y: 0, z: -3.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 251463554}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: -10.562, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -8, y: 0, z: 0}
 --- !u!1 &1050163416
 GameObject:
   m_ObjectHideFlags: 0

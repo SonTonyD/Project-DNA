@@ -26,9 +26,7 @@ namespace DNA
             jumpID = Animator.StringToHash("Jump");
             groundedID = Animator.StringToHash("Grounded");
             freeFallID = Animator.StringToHash("FreeFall");
-
         }
-
 
         public void SetJumpAnimation(bool isJumping)
         {
@@ -39,9 +37,6 @@ namespace DNA
         {
             anim.SetBool(groundedID, isGrounded);
         }
-
-
-
 
         public void UpdateAnimatorValues(float verticalMovement, float horizontalMovement)
         {
@@ -105,6 +100,7 @@ namespace DNA
             anim.SetBool("isInteracting", isInteracting);
             anim.CrossFade(targetAnim, 0.2f);
         }
+
         public void CanRotate()
         {
             canRotate = true;
