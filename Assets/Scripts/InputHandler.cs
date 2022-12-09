@@ -18,7 +18,6 @@ namespace DNA
         public bool leftTrigger_Input;
         public bool sprintFlag;
 
-
         PlayerControl inputActions;
         CameraHandler cameraHandler;
 
@@ -31,13 +30,13 @@ namespace DNA
             cameraHandler = CameraHandler.singleton;
         }
 
-        private void FixedUpdate()
+        private void Update()
         {
-            float delta = Time.fixedDeltaTime;
+            float delta = Time.deltaTime;
             if (cameraHandler != null)
             {
                 cameraHandler.FollowTarget(delta);
-                cameraHandler.handleCameraRotation(delta, mouseX, mouseY);
+                cameraHandler.HandleCameraRotation(delta, mouseX, mouseY);
             }
         }
 
@@ -48,7 +47,6 @@ namespace DNA
                 inputActions = new PlayerControl();
                 inputActions.PlayerMovement.Movement.performed += inputActions => movementInput = inputActions.ReadValue<Vector2>();
                 inputActions.PlayerMovement.Camera.performed += i => cameraInput = i.ReadValue<Vector2>();
-                
             }
 
             inputActions.Enable();
@@ -86,7 +84,6 @@ namespace DNA
             {
                 jumpFlag = false;
             }
-
         }
 
         private void HandleSprintInput(float delta)
@@ -101,7 +98,6 @@ namespace DNA
                 sprintFlag = false;
             }
         }
-
     }
 }
 

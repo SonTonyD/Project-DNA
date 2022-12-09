@@ -10,7 +10,6 @@ namespace DNA
         public Transform cameraTransform;
         public Transform cameraPivotTransform;
         private Transform myTransform;
-        private Vector3 cameraTransformPosition;
         private LayerMask ignoreLayers;
         private Vector3 cameraFollowVelocity = Vector3.zero;
 
@@ -23,8 +22,9 @@ namespace DNA
         private float defaultPosition;
         private float lookAngle;
         private float pivotAngle;
-        public float minimumPivot = -30;
-        public float maximumPivot = 90;
+        public float minimumPivot = -30.0f;
+        public float maximumPivot = 70.0f;
+
 
         private void Awake()
         {
@@ -32,6 +32,9 @@ namespace DNA
             myTransform = transform;
             defaultPosition = cameraTransform.localPosition.z;
             ignoreLayers = ~(1 << 8 | 1 << 9 | 1 << 10);
+            cameraTransform.position = new Vector3(0, 0, -3.5f);
+            cameraTransform.rotation = Quaternion.Euler(new Vector3(-8, 0, 0));
+            cameraPivotTransform.position = new Vector3(0, 1.54f, -0.025f);
             Cursor.lockState = CursorLockMode.Locked;
         }
 
@@ -41,7 +44,7 @@ namespace DNA
             myTransform.position = targetPosition;
         }
 
-        public void handleCameraRotation(float delta, float mouseXInput, float mouseYInput)
+        public void HandleCameraRotation(float delta, float mouseXInput, float mouseYInput)
         {
             lookAngle += (mouseXInput * horizontalSensitivity) / delta;
             pivotAngle += (mouseYInput * verticalSensibility) / delta;

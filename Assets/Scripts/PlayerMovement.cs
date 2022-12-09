@@ -22,9 +22,8 @@ namespace DNA
 
         public bool Grounded;
         public LayerMask GroundLayers;
-        public float GroundedOffset = -0.07f;
+        public float GroundedOffset = -0.08f;
         public float GroundedRadius = 0.26f;
-
 
         private float _verticalVelocity;
         private float _terminalVelocity = 53.0f;
@@ -33,31 +32,26 @@ namespace DNA
 
         [Header("Stats")]
         [SerializeField]
-        float movementSpeed = 8;
+        float movementSpeed = 8.0f;
         [SerializeField]
-        float rotationSpeed = 10;
+        float rotationSpeed = 10.0f;
         [SerializeField]
-        float jumpHeight = 4;
+        float jumpHeight = 1.8f;
         [SerializeField]
-        float gravity = -10;
+        float gravity = -15.0f;
         [SerializeField]
-        float sprintSpeed = 12;
-
+        float sprintSpeed = 12.0f;
 
 
         void Start()
         {
-            //rigidbody = GetComponent<Rigidbody>();
-
             _controller = GetComponent<CharacterController>();
-
-
             inputHandler = GetComponent<InputHandler>();
             animatorHandler = GetComponentInChildren<AnimatorHandler>();
             cameraObject = Camera.main.transform;
             myTransform = transform;
             animatorHandler.Initialize();
-            
+            GroundLayers = LayerMask.GetMask("Floor");
         }
 
         public void Update()
@@ -66,14 +60,10 @@ namespace DNA
             GroundedCheck();
             HandleJumping(delta);
             HandleMovement(delta);
-            
-
-
         }
 
         #region Movement
         Vector3 normalVector;
-        Vector3 targetPosition;
         private void HandleRotation(float delta)
         {
             Vector3 targetDir = Vector3.zero;
@@ -97,8 +87,6 @@ namespace DNA
             myTransform.rotation = targetRotation;
         }
 
-        
-
         public void HandleMovement(float delta)
         {
             inputHandler.TickInput(delta);
@@ -111,10 +99,8 @@ namespace DNA
 
             if (inputHandler.sprintFlag)
             {
-                Debug.Log("Je cours");
                 speed = sprintSpeed;
             }
-            Debug.Log(speed);
 
             moveDirection *= speed;
 
@@ -131,15 +117,12 @@ namespace DNA
 
         public void HandleJumping(float delta)
         {
-
             animatorHandler.SetGroundedAnimation(Grounded);
             animatorHandler.SetJumpAnimation(inputHandler.jumpFlag);
-
 
             if (Grounded && _verticalVelocity < 0)
             {
                 _verticalVelocity = -2f;
-                
             }
 
             if ((inputHandler.jumpFlag && Grounded) || (inputHandler.jumpFlag && !_didSecondJump && !Grounded))
@@ -156,16 +139,12 @@ namespace DNA
                 {
                     _didSecondJump = true;
                 }
-
-                
             }
 
             if (_verticalVelocity < _terminalVelocity)
             {
                 _verticalVelocity += gravity * delta;
             }
-
-
 
             if (animatorHandler.anim.GetBool("isInteracting"))
             {
@@ -182,12 +161,7 @@ namespace DNA
                 QueryTriggerInteraction.Ignore);
         }
 
-
-
-
         #endregion
-
-
     }
 }
 
