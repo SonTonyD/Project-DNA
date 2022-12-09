@@ -122,9 +122,14 @@ namespace DNA
         public void HandleJumping(float delta)
         {
 
+            animatorHandler.SetGroundedAnimation(Grounded);
+            animatorHandler.SetJumpAnimation(inputHandler.jumpFlag);
+
+
             if (Grounded && _verticalVelocity < 0)
             {
                 _verticalVelocity = -2f;
+                
             }
 
             if ((inputHandler.jumpFlag && Grounded) || (inputHandler.jumpFlag && !_didSecondJump && !Grounded))

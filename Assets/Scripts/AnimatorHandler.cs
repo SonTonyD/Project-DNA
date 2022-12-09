@@ -12,12 +12,36 @@ namespace DNA
         int horizontal;
         public bool canRotate;
 
+        public int jumpID;
+        public int groundedID;
+        public int freeFallID;
+
+
         public void Initialize()
         {
             anim = GetComponent<Animator>();
             vertical = Animator.StringToHash("Vertical");
             horizontal = Animator.StringToHash("Horizontal");
+
+            jumpID = Animator.StringToHash("Jump");
+            groundedID = Animator.StringToHash("Grounded");
+            freeFallID = Animator.StringToHash("FreeFall");
+
         }
+
+
+        public void SetJumpAnimation(bool isJumping)
+        {
+            anim.SetBool(jumpID, isJumping);
+        }
+
+        public void SetGroundedAnimation(bool isGrounded)
+        {
+            anim.SetBool(groundedID, isGrounded);
+        }
+
+
+
 
         public void UpdateAnimatorValues(float verticalMovement, float horizontalMovement)
         {
@@ -94,6 +118,11 @@ namespace DNA
         private void OnFootstep(AnimationEvent animationEvent)
         {
             
+        }
+
+        private void OnLand(AnimationEvent animationEvent)
+        {
+
         }
     }
 }
