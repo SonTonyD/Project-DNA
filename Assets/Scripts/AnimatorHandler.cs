@@ -7,35 +7,41 @@ namespace DNA
 {
     public class AnimatorHandler : MonoBehaviour
     {
-        public Animator anim;
-        int vertical;
-        int horizontal;
-        public bool canRotate;
+        private Animator _anim;
+        [SerializeField]
+        private int _vertical;
+        [SerializeField]
+        private int _horizontal;
+        [SerializeField]
+        private bool _isRotationEnabled;
 
-        public int jumpID;
-        public int groundedID;
-        public int freeFallID;
+        private int _jumpID;
+        private int _groundedID;
+        private int _freeFallID;
 
+        public bool IsRotationEnabled { get => _isRotationEnabled; set => _isRotationEnabled = value; }
+        public Animator Anim { get => _anim; set => _anim = value; }
 
         public void Initialize()
         {
-            anim = GetComponent<Animator>();
-            vertical = Animator.StringToHash("Vertical");
-            horizontal = Animator.StringToHash("Horizontal");
+            _isRotationEnabled = true;
+            _anim = GetComponent<Animator>();
+            _vertical = Animator.StringToHash("Vertical");
+            _horizontal = Animator.StringToHash("Horizontal");
 
-            jumpID = Animator.StringToHash("Jump");
-            groundedID = Animator.StringToHash("Grounded");
-            freeFallID = Animator.StringToHash("FreeFall");
+            _jumpID = Animator.StringToHash("Jump");
+            _groundedID = Animator.StringToHash("Grounded");
+            _freeFallID = Animator.StringToHash("FreeFall");
         }
 
         public void SetJumpAnimation(bool isJumping)
         {
-            anim.SetBool(jumpID, isJumping);
+            _anim.SetBool(_jumpID, isJumping);
         }
 
         public void SetGroundedAnimation(bool isGrounded)
         {
-            anim.SetBool(groundedID, isGrounded);
+            _anim.SetBool(_groundedID, isGrounded);
         }
 
         public void UpdateAnimatorValues(float verticalMovement, float horizontalMovement)
@@ -90,25 +96,25 @@ namespace DNA
             }
             #endregion
 
-            anim.SetFloat(vertical, v, 0.1f, Time.deltaTime);
-            anim.SetFloat(horizontal, h, 0.1f, Time.deltaTime);
+            _anim.SetFloat(_vertical, v, 0.1f, Time.deltaTime);
+            _anim.SetFloat(_horizontal, h, 0.1f, Time.deltaTime);
         }
 
         public void PlayerTargetAnimation(string targetAnim, bool isInteracting)
         {
-            anim.applyRootMotion = isInteracting;
-            anim.SetBool("isInteracting", isInteracting);
-            anim.CrossFade(targetAnim, 0.2f);
+            _anim.applyRootMotion = isInteracting;
+            _anim.SetBool("isInteracting", isInteracting);
+            _anim.CrossFade(targetAnim, 0.2f);
         }
 
         public void CanRotate()
         {
-            canRotate = true;
+            _isRotationEnabled = true;
         }
 
         public void StopRotate()
         {
-            canRotate = false;
+            _isRotationEnabled = false;
         }
 
         private void OnFootstep(AnimationEvent animationEvent)

@@ -6,55 +6,69 @@ namespace DNA
 {
     public class InputHandler : MonoBehaviour
     {
-        public float horizontal;
-        public float vertical;
-        public float moveAmount;
-        public float mouseX;
-        public float mouseY;
+        [SerializeField]
+        private float _horizontal;
+        [SerializeField]
+        private float _vertical;
+        [SerializeField]
+        private float _moveAmount;
+        [SerializeField]
+        private float _mouseX;
+        [SerializeField]
+        private float _mouseY;
 
-        public bool a_Input;
-        public bool jumpFlag;
+        [SerializeField]
+        private bool _a_Input;
+        [SerializeField]
+        private bool _jumpFlag;
 
-        public bool leftTrigger_Input;
-        public bool sprintFlag;
+        [SerializeField]
+        private bool _leftTrigger_Input;
+        [SerializeField]
+        private bool _sprintFlag;
 
-        PlayerControl inputActions;
-        CameraHandler cameraHandler;
+        private PlayerControl _inputActions;
+        private CameraHandler _cameraHandler;
 
-        Vector2 movementInput;
-        Vector2 cameraInput;
+        private Vector2 _movementInput;
+        private Vector2 _cameraInput;
 
+        public float Horizontal { get => _horizontal; set => _horizontal = value; }
+        public float Vertical { get => _vertical; set => _vertical = value; }
+        public bool SprintFlag { get => _sprintFlag; set => _sprintFlag = value; }
+        public bool JumpFlag { get => _jumpFlag; set => _jumpFlag = value; }
+        public float MoveAmount { get => _moveAmount; set => _moveAmount = value; }
 
         private void Start()
         {
-            cameraHandler = CameraHandler.singleton;
+            _cameraHandler = CameraHandler.singleton;
         }
 
         private void Update()
         {
             float delta = Time.deltaTime;
-            if (cameraHandler != null)
+            if (_cameraHandler != null)
             {
-                cameraHandler.FollowTarget(delta);
-                cameraHandler.HandleCameraRotation(delta, mouseX, mouseY);
+                _cameraHandler.FollowTarget(delta);
+                _cameraHandler.HandleCameraRotation(delta, _mouseX, _mouseY);
             }
         }
 
         public void OnEnable()
         {
-            if (inputActions == null)
+            if (_inputActions == null)
             {
-                inputActions = new PlayerControl();
-                inputActions.PlayerMovement.Movement.performed += inputActions => movementInput = inputActions.ReadValue<Vector2>();
-                inputActions.PlayerMovement.Camera.performed += i => cameraInput = i.ReadValue<Vector2>();
+                _inputActions = new PlayerControl();
+                _inputActions.PlayerMovement.Movement.performed += inputActions => _movementInput = inputActions.ReadValue<Vector2>();
+                _inputActions.PlayerMovement.Camera.performed += i => _cameraInput = i.ReadValue<Vector2>();
             }
 
-            inputActions.Enable();
+            _inputActions.Enable();
         }
 
         public void OnDisable()
         {
-            inputActions.Disable();
+            _inputActions.Disable();
         }
 
         public void TickInput(float delta)
@@ -66,36 +80,36 @@ namespace DNA
 
         private void MoveInput(float delta)
         {
-            horizontal = movementInput.x;
-            vertical = movementInput.y;
-            moveAmount = Mathf.Clamp01(Mathf.Abs(horizontal) + Mathf.Abs(vertical));
-            mouseX = cameraInput.x;
-            mouseY = cameraInput.y;
+            _horizontal = _movementInput.x;
+            _vertical = _movementInput.y;
+            _moveAmount = Mathf.Clamp01(Mathf.Abs(_horizontal) + Mathf.Abs(_vertical));
+            _mouseX = _cameraInput.x;
+            _mouseY = _cameraInput.y;
         }
 
         private void HandleJumpInput(float delta)
         {
-            a_Input = inputActions.PlayerActions.Jump.triggered;
-            if (a_Input)
+            _a_Input = _inputActions.PlayerActions.Jump.triggered;
+            if (_a_Input)
             {
-                jumpFlag = true;
+                _jumpFlag = true;
             }
             else
             {
-                jumpFlag = false;
+                _jumpFlag = false;
             }
         }
 
         private void HandleSprintInput(float delta)
         {
-            leftTrigger_Input = inputActions.PlayerActions.Sprint.IsPressed();
-            if (leftTrigger_Input)
+            _leftTrigger_Input = _inputActions.PlayerActions.Sprint.IsPressed();
+            if (_leftTrigger_Input)
             {
-                sprintFlag = true;
+                _sprintFlag = true;
             }
             else
             {
-                sprintFlag = false;
+                _sprintFlag = false;
             }
         }
     }
