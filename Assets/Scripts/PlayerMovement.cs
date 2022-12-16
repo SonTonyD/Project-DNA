@@ -6,36 +6,32 @@ namespace DNA
 {
     public class PlayerMovement : MonoBehaviour
     {
+        [Header("References")]
         [SerializeField]
         private Transform _cameraObject;
         [SerializeField]
         private InputHandler _inputHandler;
         private Vector3 _moveDirection;
-
         [HideInInspector]
         private Transform _myTransform;
         [HideInInspector]
         private AnimatorHandler _animatorHandler;
-
-        //public new Rigidbody rigidbody;
         [SerializeField]
         private GameObject _normalCamera;
-
         [SerializeField]
         private CharacterController _controller;
 
+        [Header("Jump Stats")]
         [SerializeField]
         private bool _isGrounded;
         [SerializeField]
         private LayerMask _GroundLayers;
         [SerializeField]
         private float _GroundedOffset = -0.08f;
-
         [SerializeField]
         private float _verticalVelocity;
         [SerializeField]
         private float _terminalVelocity = 53.0f;
-
         [SerializeField]
         private bool _didSecondJump = false;
 
@@ -61,14 +57,6 @@ namespace DNA
             _myTransform = transform;
             _animatorHandler.Initialize();
             _GroundLayers = LayerMask.GetMask("Floor");
-        }
-
-        public void Update()
-        {
-            float delta = Time.deltaTime;
-            GroundedCheck();
-            HandleJumping(delta);
-            HandleMovement(delta);
         }
 
         #region Movement
@@ -161,7 +149,7 @@ namespace DNA
             }
         }
 
-        private void GroundedCheck()
+        public void GroundedCheck()
         {
             // set sphere position, with offset
             Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - _GroundedOffset,

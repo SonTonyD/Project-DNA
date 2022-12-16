@@ -28,7 +28,6 @@ namespace DNA
         private bool _sprintFlag;
 
         private PlayerControl _inputActions;
-        private CameraHandler _cameraHandler;
 
         private Vector2 _movementInput;
         private Vector2 _cameraInput;
@@ -38,20 +37,12 @@ namespace DNA
         public bool SprintFlag { get => _sprintFlag; set => _sprintFlag = value; }
         public bool JumpFlag { get => _jumpFlag; set => _jumpFlag = value; }
         public float MoveAmount { get => _moveAmount; set => _moveAmount = value; }
-
-        private void Start()
-        {
-            _cameraHandler = CameraHandler.singleton;
-        }
+        public float MouseX { get => _mouseX; set => _mouseX = value; }
+        public float MouseY { get => _mouseY; set => _mouseY = value; }
 
         private void Update()
         {
-            float delta = Time.deltaTime;
-            if (_cameraHandler != null)
-            {
-                _cameraHandler.FollowTarget(delta);
-                _cameraHandler.HandleCameraRotation(delta, _mouseX, _mouseY);
-            }
+
         }
 
         public void OnEnable()
