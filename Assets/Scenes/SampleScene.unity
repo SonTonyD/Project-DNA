@@ -372,7 +372,7 @@ MonoBehaviour:
   _isGrounded: 0
   _GroundLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 512
   _GroundedOffset: -0.08
   _verticalVelocity: 0
   _terminalVelocity: 53
@@ -446,7 +446,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 251463554}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Camera Pivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -479,7 +479,7 @@ GameObject:
   m_Component:
   - component: {fileID: 471761262}
   - component: {fileID: 471761263}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Camera Holder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -522,6 +522,9 @@ MonoBehaviour:
   _verticalSensitivity: 0.01
   _minimumPivot: -30
   _maximumPivot: 70
+  _cameraSphereRadius: 0.2
+  _cameraCollisionOffset: 0.2
+  _minimumCameraOffset: 0.2
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
