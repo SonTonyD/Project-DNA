@@ -48,10 +48,13 @@ namespace DNA
         private Transform _currentLockOnTarget;
         private List<CharacterManager> _availableTargets = new List<CharacterManager>();
         private Transform _nearestLockOnTarget;
+        private Transform _leftLockTarget;
+        private Transform _rightLockTarget;
 
         public Transform CurrentLockOnTarget { get => _currentLockOnTarget; set => _currentLockOnTarget = value; }
         public Transform NearestLockOnTarget { get => _nearestLockOnTarget; set => _nearestLockOnTarget = value; }
-
+        public Transform LeftLockTarget { get => _leftLockTarget; set => _leftLockTarget = value; }
+        public Transform RightLockTarget { get => _rightLockTarget; set => _rightLockTarget = value; }
 
         private void Awake()
         {
@@ -137,6 +140,8 @@ namespace DNA
         public void HandleLockOn()
         {
             float shortestDistance = Mathf.Infinity;
+            float shortestDistanceOfLeftTarget = Mathf.Infinity;
+            float shortestDistanceOfRightTarget = Mathf.Infinity;
 
             Collider[] colliders = Physics.OverlapSphere(_targetTransform.position, 26);
 
@@ -165,6 +170,26 @@ namespace DNA
                 {
                     shortestDistance = distanceFromTarget;
                     _nearestLockOnTarget = _availableTargets[k].LockOnTransform;
+                }
+                
+                if (_inputHandler.LockOnFlag)
+                {
+                    Vector3 relativeEnemyPosition = _currentLockOnTarget.InverseTransformPoint(_availableTargets[k].transform.position);
+                    var distanceFromLeftTarget = _currentLockOnTarget.transform.position.x - _availableTargets[k].transform.position.x;
+                    var distanceFromRightTarget = _currentLockOnTarget.transform.position.x + _availableTargets[k].transform.position.x;
+
+                    if (relativeEnemyPosition.x > 0.00 && distanceFromLeftTarget < shortestDistanceOfLeftTarget)
+                    {
+                        shortestDistanceOfLeftTarget = distanceFromLeftTarget;
+                        _leftLockTarget = _availableTargets[k].LockOnTransform;
+                    }
+
+                    if (relativeEnemyPosition.x < 0.00 && distanceFromRightTarget < shortestDistanceOfRightTarget)
+                    {
+                        shortestDistanceOfRightTarget = distanceFromRightTarget;
+                        _rightLockTarget = _availableTargets[k].LockOnTransform;
+                    }
+
                 }
             }
         }

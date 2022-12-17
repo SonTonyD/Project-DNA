@@ -30,6 +30,10 @@ namespace DNA
         [SerializeField]
         private bool _lockOnInput;
         [SerializeField]
+        private bool _right_Stick_Right_Input;
+        [SerializeField]
+        private bool _right_Stick_Left_Input;
+        [SerializeField]
         private bool _lockOnFlag;
 
         private PlayerControl _inputActions;
@@ -62,6 +66,8 @@ namespace DNA
                 _inputActions.PlayerMovement.Movement.performed += inputActions => _movementInput = inputActions.ReadValue<Vector2>();
                 _inputActions.PlayerMovement.Camera.performed += i => _cameraInput = i.ReadValue<Vector2>();
                 _inputActions.PlayerActions.LockOn.performed += i => _lockOnInput = true;
+                _inputActions.PlayerMovement.LockOnTargetRight.performed += i => _right_Stick_Right_Input = true;
+                _inputActions.PlayerMovement.LockOnTargetLeft.performed += i => _right_Stick_Left_Input = true;
             }
 
             _inputActions.Enable();
@@ -120,7 +126,6 @@ namespace DNA
         {
             if (_lockOnInput && _lockOnFlag == false)
             {
-                _cameraHandler.ClearLockOnTargets();
                 _lockOnInput = false;
                 _cameraHandler.HandleLockOn();
 
@@ -135,6 +140,28 @@ namespace DNA
                 _lockOnInput = false;
                 _lockOnFlag = false;
                 _cameraHandler.ClearLockOnTargets();
+            }
+
+            if (_lockOnFlag && _right_Stick_Left_Input)
+            {
+                _right_Stick_Left_Input = false;
+                _cameraHandler.HandleLockOn();
+
+                if (_cameraHandler.LeftLockTarget != null)
+                {
+                    _cameraHandler.CurrentLockOnTarget = _cameraHandler.LeftLockTarget;
+                }
+            }
+
+            if (_lockOnFlag && _right_Stick_Right_Input)
+            {
+                _right_Stick_Right_Input = false;
+                _cameraHandler.HandleLockOn();
+
+                if (_cameraHandler.RightLockTarget != null)
+                {
+                    _cameraHandler.CurrentLockOnTarget = _cameraHandler.RightLockTarget;
+                }
             }
         }
     }
