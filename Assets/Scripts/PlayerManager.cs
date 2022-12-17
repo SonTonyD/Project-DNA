@@ -5,12 +5,14 @@ using UnityEngine;
 
 namespace DNA
 {
-    public class PlayerManager : MonoBehaviour
+    public class PlayerManager : CharacterManager
     {
         private InputHandler _inputHandler;
         private Animator _anim;
         private CameraHandler _cameraHandler;
         private PlayerMovement _playerMovement;
+
+
         void Start()
         {
             _inputHandler = GetComponent<InputHandler>();
@@ -18,7 +20,6 @@ namespace DNA
             _cameraHandler = CameraHandler.singleton;
             _playerMovement = GetComponent<PlayerMovement>();
         }
-
 
         void Update()
         {
@@ -33,7 +34,6 @@ namespace DNA
             _playerMovement.GroundedCheck();
             _playerMovement.HandleJumping(delta);
             _playerMovement.HandleMovement(delta);
-            
         }
     }
 }

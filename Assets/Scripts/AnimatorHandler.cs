@@ -22,13 +22,13 @@ namespace DNA
         public bool IsRotationEnabled { get => _isRotationEnabled; set => _isRotationEnabled = value; }
         public Animator Anim { get => _anim; set => _anim = value; }
 
+
         public void Initialize()
         {
             _isRotationEnabled = true;
             _anim = GetComponent<Animator>();
             _vertical = Animator.StringToHash("Vertical");
             _horizontal = Animator.StringToHash("Horizontal");
-
             _jumpID = Animator.StringToHash("Jump");
             _groundedID = Animator.StringToHash("Grounded");
             _freeFallID = Animator.StringToHash("FreeFall");
