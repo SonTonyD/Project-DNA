@@ -16,6 +16,9 @@ namespace DNA
         private Vector3 _cameraTransformPosition;
         private Transform _myTransform;
         private LayerMask _ignoreLayers;
+        [SerializeField]
+        private LayerMask _environmentLayer;
+        private PlayerManager _playerManager;
         private Vector3 _cameraFollowVelocity = Vector3.zero;
 
         public static CameraHandler singleton;
@@ -66,8 +69,15 @@ namespace DNA
             _defaultPosition = _cameraTransform.localPosition.z;
             _ignoreLayers = ~(1 << 8 | 1 << 11 | 1 << 10);
             _inputHandler = FindObjectOfType<InputHandler>();
+            _playerManager = FindObjectOfType<PlayerManager>();
             Cursor.lockState = CursorLockMode.Locked;
         }
+
+        private void Start()
+        {
+            _environmentLayer = LayerMask.NameToLayer("Floor");
+        }
+
 
         public void FollowTarget(float delta)
         {
@@ -140,8 +150,6 @@ namespace DNA
         public void HandleLockOn()
         {
             float shortestDistance = Mathf.Infinity;
-            float shortestDistanceOfLeftTarget = Mathf.Infinity;
-            float shortestDistanceOfRightTarget = Mathf.Infinity;
 
             Collider[] colliders = Physics.OverlapSphere(_targetTransform.position, 26);
 
@@ -154,10 +162,24 @@ namespace DNA
                     Vector3 lockTargetDirection = character.transform.position - _targetTransform.position;
                     float distanceFromTarget = Vector3.Distance(_targetTransform.position, character.transform.position);
                     float viewableAngle = Vector3.Angle(lockTargetDirection, _cameraTransform.forward);
+                    RaycastHit hit;
 
                     if (character.transform.root != _targetTransform.transform.root && viewableAngle > -50 && viewableAngle < 50 && distanceFromTarget <= _maximumLockOnDistance)
                     { 
-                        _availableTargets.Add(character);
+                        
+                        if (Physics.Linecast(_playerManager.LockOnTransform.position, character.LockOnTransform.position, out hit))
+                        {
+                            Debug.DrawLine(_playerManager.LockOnTransform.position, character.LockOnTransform.position);
+
+                            if (hit.transform.gameObject.layer == _environmentLayer)
+                            {
+
+                            }
+                            else
+                            {
+                                _availableTargets.Add(character);
+                            }
+                        }
                     }
                 }
             }
@@ -174,22 +196,21 @@ namespace DNA
                 
                 if (_inputHandler.LockOnFlag)
                 {
-                    Vector3 relativeEnemyPosition = _currentLockOnTarget.InverseTransformPoint(_availableTargets[k].transform.position);
-                    var distanceFromLeftTarget = _currentLockOnTarget.transform.position.x - _availableTargets[k].transform.position.x;
-                    var distanceFromRightTarget = _currentLockOnTarget.transform.position.x + _availableTargets[k].transform.position.x;
+                    Vector3 lockTargetDirection = _availableTargets[k].transform.position - _cameraTransform.position;
+                    Vector3 viewDirection = _cameraTransform.forward;
+                    lockTargetDirection.y = 0;
+                    viewDirection.y = 0;
+                    float relativeAngle = Vector3.SignedAngle(viewDirection, lockTargetDirection, Vector3.up);
 
-                    if (relativeEnemyPosition.x > 0.00 && distanceFromLeftTarget < shortestDistanceOfLeftTarget)
+                    if (relativeAngle < 0.00f)
                     {
-                        shortestDistanceOfLeftTarget = distanceFromLeftTarget;
                         _leftLockTarget = _availableTargets[k].LockOnTransform;
                     }
 
-                    if (relativeEnemyPosition.x < 0.00 && distanceFromRightTarget < shortestDistanceOfRightTarget)
+                    if (relativeAngle > 0.00f)
                     {
-                        shortestDistanceOfRightTarget = distanceFromRightTarget;
                         _rightLockTarget = _availableTargets[k].LockOnTransform;
                     }
-
                 }
             }
         }
