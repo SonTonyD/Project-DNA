@@ -31,7 +31,7 @@ namespace DNA
         [SerializeField]
         private float _verticalVelocity;
         [SerializeField]
-        private float _terminalVelocity = 53.0f;
+        private float _terminalVelocity = 50.0f;
         [SerializeField]
         private bool _didSecondJump = false;
 
@@ -41,7 +41,7 @@ namespace DNA
         [SerializeField]
         private float rotationSpeed = 10.0f;
         [SerializeField]
-        private float jumpHeight = 1.8f;
+        private float jumpHeight = 2f;
         [SerializeField]
         private float gravity = -15.0f;
         [SerializeField]
@@ -156,6 +156,11 @@ namespace DNA
                 transform.position.z);
             _isGrounded = Physics.CheckSphere(spherePosition, _controller.radius, _GroundLayers,
                 QueryTriggerInteraction.Ignore);
+
+            if (_isGrounded)
+            {
+                _didSecondJump = false;
+            }
         }
 
         #endregion
