@@ -11,12 +11,18 @@ namespace DNA
         private Animator _anim;
         private CameraHandler _cameraHandler;
         private PlayerMovement _playerMovement;
+
+        private const float _HeightComputeConstant = 0.15f;
+
+
         void Start()
         {
             _inputHandler = GetComponent<InputHandler>();
             _anim = GetComponentInChildren<Animator>();
             _cameraHandler = CameraHandler.singleton;
             _playerMovement = GetComponent<PlayerMovement>();
+
+            SetCharacterHeightFromModel();
         }
 
 
@@ -34,6 +40,15 @@ namespace DNA
             _playerMovement.HandleJumping(delta);
             _playerMovement.HandleMovement(delta);
             
+        }
+
+        private void SetCharacterHeightFromModel()
+        {
+            CharacterController controller = _playerMovement.GetComponent<CharacterController>();
+            SkinnedMeshRenderer mesh = transform.GetComponentInChildren<SkinnedMeshRenderer>();
+            controller.height = mesh.bounds.center.y + mesh.bounds.extents.y - _HeightComputeConstant;
+            float controllerCenterY = (mesh.bounds.center.y + mesh.bounds.extents.y) / 2;
+            controller.center = new Vector3(0, controllerCenterY, 0);
         }
     }
 }
