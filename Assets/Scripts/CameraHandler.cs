@@ -59,19 +59,28 @@ namespace DNA
         private Transform _rightLockTarget;
         private Transform _rightCandidate;
         private Transform _leftCandidate;
+        
+        [SerializeField]
+        private float _cameraPivotYOffset;
+        private const float _CameraPivotYOffsetConstant = 0.15f;
 
         public Transform CurrentLockOnTarget { get => _currentLockOnTarget; set => _currentLockOnTarget = value; }
         public Transform NearestLockOnTarget { get => _nearestLockOnTarget; set => _nearestLockOnTarget = value; }
         public Transform LeftLockTarget { get => _leftLockTarget; set => _leftLockTarget = value; }
         public Transform RightLockTarget { get => _rightLockTarget; set => _rightLockTarget = value; }
 
+
         private void Awake()
         {
             singleton = this;
             _myTransform = transform;
             _cameraTransform.position = new Vector3(0, 0, -3.5f);
-            _cameraTransform.rotation = Quaternion.Euler(new Vector3(-8, 0, 0));
-            _cameraPivotTransform.position = new Vector3(0, 1.54f, -0.025f);
+            _cameraTransform.rotation = Quaternion.Euler(new Vector3(-10, 0, 0));
+
+            CharacterController controller = _targetTransform.GetComponent<CharacterController>();
+            _cameraPivotYOffset = controller.height - _CameraPivotYOffsetConstant;
+
+            _cameraPivotTransform.position = new Vector3(0, _cameraPivotYOffset, -0.025f);
             _defaultPosition = _cameraTransform.localPosition.z;
             _ignoreLayers = ~(1 << 8 | 1 << 11 | 1 << 10);
             _inputHandler = FindObjectOfType<InputHandler>();
