@@ -76,6 +76,7 @@ namespace DNA
             {
                 targetDir = _myTransform.forward;
             }
+
             float rs = rotationSpeed;
 
             Quaternion tr = Quaternion.LookRotation(targetDir);

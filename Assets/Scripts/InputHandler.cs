@@ -27,7 +27,23 @@ namespace DNA
         [SerializeField]
         private bool _sprintFlag;
 
+        [SerializeField]
+        private bool _lockOnInput;
+        [SerializeField]
+        private bool _right_Stick_Right_Input;
+        [SerializeField]
+        private bool _right_Stick_Left_Input;
+        [SerializeField]
+        private bool _lockOnFlag;
+        [SerializeField]
+        private bool _lockOnRightFlag;
+        [SerializeField]
+        private bool _lockOnLeftFlag;
+
+
         private PlayerControl _inputActions;
+        [SerializeField]
+        private CameraHandler _cameraHandler;
 
         private Vector2 _movementInput;
         private Vector2 _cameraInput;
@@ -39,10 +55,13 @@ namespace DNA
         public float MoveAmount { get => _moveAmount; set => _moveAmount = value; }
         public float MouseX { get => _mouseX; set => _mouseX = value; }
         public float MouseY { get => _mouseY; set => _mouseY = value; }
+        public bool LockOnFlag { get => _lockOnFlag; set => _lockOnFlag = value; }
+        public bool LockOnRightFlag { get => _lockOnRightFlag; set => _lockOnRightFlag = value; }
+        public bool LockOnLeftFlag { get => _lockOnLeftFlag; set => _lockOnLeftFlag = value; }
 
-        private void Update()
+        private void Start()
         {
-
+            _cameraHandler = FindObjectOfType<CameraHandler>();
         }
 
         public void OnEnable()
@@ -52,6 +71,9 @@ namespace DNA
                 _inputActions = new PlayerControl();
                 _inputActions.PlayerMovement.Movement.performed += inputActions => _movementInput = inputActions.ReadValue<Vector2>();
                 _inputActions.PlayerMovement.Camera.performed += i => _cameraInput = i.ReadValue<Vector2>();
+                _inputActions.PlayerActions.LockOn.performed += i => _lockOnInput = true;
+                _inputActions.PlayerMovement.LockOnTargetRight.performed += i => _right_Stick_Right_Input = true;
+                _inputActions.PlayerMovement.LockOnTargetLeft.performed += i => _right_Stick_Left_Input = true;
             }
 
             _inputActions.Enable();
@@ -67,6 +89,7 @@ namespace DNA
             MoveInput(delta);
             HandleJumpInput(delta);
             HandleSprintInput(delta);
+            HandleLockOnInput(delta);
         }
 
         private void MoveInput(float delta)
@@ -81,6 +104,7 @@ namespace DNA
         private void HandleJumpInput(float delta)
         {
             _a_Input = _inputActions.PlayerActions.Jump.triggered;
+
             if (_a_Input)
             {
                 _jumpFlag = true;
@@ -101,6 +125,53 @@ namespace DNA
             else
             {
                 _sprintFlag = false;
+            }
+        }
+
+        private void HandleLockOnInput(float delta)
+        {
+            if (_lockOnInput && _lockOnFlag == false)
+            {
+                _lockOnInput = false;
+                _cameraHandler.HandleLockOn(delta);
+
+                if (_cameraHandler.NearestLockOnTarget != null)
+                {
+                    _cameraHandler.CurrentLockOnTarget = _cameraHandler.NearestLockOnTarget;
+                    _lockOnFlag = true;
+                }
+            }
+            else if (_lockOnInput && _lockOnFlag)
+            {
+                _lockOnInput = false;
+                _lockOnFlag = false;
+                _cameraHandler.ClearLockOnTargets();
+            }
+
+            if (_lockOnFlag && _right_Stick_Left_Input)
+            {
+                _lockOnLeftFlag = true;
+                _right_Stick_Left_Input = false;
+                _cameraHandler.HandleLockOn(delta);
+
+                if (_cameraHandler.LeftLockTarget != null)
+                {
+                    _cameraHandler.CurrentLockOnTarget = _cameraHandler.LeftLockTarget;
+                }
+                _lockOnLeftFlag = false;
+            }
+
+            if (_lockOnFlag && _right_Stick_Right_Input)
+            {
+                _lockOnRightFlag = true;
+                _right_Stick_Right_Input = false;
+                _cameraHandler.HandleLockOn(delta);
+
+                if (_cameraHandler.RightLockTarget != null)
+                {
+                    _cameraHandler.CurrentLockOnTarget = _cameraHandler.RightLockTarget;
+                }
+                _lockOnRightFlag = false;
             }
         }
     }

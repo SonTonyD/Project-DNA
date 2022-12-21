@@ -5,15 +5,13 @@ using UnityEngine;
 
 namespace DNA
 {
-    public class PlayerManager : MonoBehaviour
+    public class PlayerManager : CharacterManager
     {
         private InputHandler _inputHandler;
         private Animator _anim;
         private CameraHandler _cameraHandler;
         private PlayerMovement _playerMovement;
-
         private const float _HeightComputeConstant = 0.15f;
-
 
         void Start()
         {
@@ -25,7 +23,6 @@ namespace DNA
             SetCharacterHeightFromModel();
         }
 
-
         void Update()
         {
             float delta = Time.deltaTime;
@@ -34,12 +31,12 @@ namespace DNA
             {
                 _cameraHandler.FollowTarget(delta);
                 _cameraHandler.HandleCameraRotation(delta, _inputHandler.MouseX, _inputHandler.MouseY);
+                _cameraHandler.UpdateAvailableTargets(delta);
             }
 
             _playerMovement.GroundedCheck();
             _playerMovement.HandleJumping(delta);
             _playerMovement.HandleMovement(delta);
-            
         }
 
         private void SetCharacterHeightFromModel()
