@@ -28,6 +28,8 @@ namespace DNA
         [SerializeField]
         private float _followSpeed = 0.1f;
         [SerializeField]
+        private float _switchTargetSpeed = 0.1f;
+        [SerializeField]
         private float _verticalSensitivity = 0.01f;
 
         private float _targetPosition;
@@ -53,6 +55,8 @@ namespace DNA
         private Transform _nearestLockOnTarget;
         private Transform _leftLockTarget;
         private Transform _rightLockTarget;
+        private Transform _rightCandidate;
+        private Transform _leftCandidate;
 
         public Transform CurrentLockOnTarget { get => _currentLockOnTarget; set => _currentLockOnTarget = value; }
         public Transform NearestLockOnTarget { get => _nearestLockOnTarget; set => _nearestLockOnTarget = value; }
@@ -77,7 +81,6 @@ namespace DNA
         {
             _environmentLayer = LayerMask.NameToLayer("Floor");
         }
-
 
         public void FollowTarget(float delta)
         {
@@ -113,7 +116,9 @@ namespace DNA
 
                 Quaternion targetRotation = Quaternion.LookRotation(dir);
 
-                transform.rotation = targetRotation;
+                //transform.rotation = targetRotation;
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, delta / _switchTargetSpeed);
+                
 
                 dir = _currentLockOnTarget.position - _cameraPivotTransform.position;
                 dir.Normalize();
@@ -147,7 +152,7 @@ namespace DNA
             _cameraTransform.localPosition = _cameraTransformPosition;
         }
 
-        public void HandleLockOn()
+        public void HandleLockOn(float delta)
         {
             float shortestDistance = Mathf.Infinity;
 
@@ -184,34 +189,50 @@ namespace DNA
                 }
             }
 
+            float shortestRightAngle = Mathf.Infinity;
+            float shortestLeftAngle = Mathf.Infinity;
             for (int k = 0; k < _availableTargets.Count; k++)
             {
+                Vector3 lockTargetDirection = _availableTargets[k].transform.position - _cameraTransform.position;
+                Vector3 viewDirection = _cameraTransform.forward;
+                lockTargetDirection.y = 0;
+                viewDirection.y = 0;
+                float relativeAngle = Vector3.SignedAngle(viewDirection, lockTargetDirection, Vector3.up);
                 float distanceFromTarget = Vector3.Distance(_targetTransform.position, _availableTargets[k].transform.position);
+
+                if (relativeAngle > 0.0f && Mathf.Abs(relativeAngle) < shortestRightAngle)
+                {
+                    shortestRightAngle = Mathf.Abs(relativeAngle);
+                    _rightCandidate = _availableTargets[k].LockOnTransform;
+                }
+
+                if (relativeAngle < 0.0f && Mathf.Abs(relativeAngle) < shortestLeftAngle)
+                {
+                    shortestLeftAngle = Mathf.Abs(relativeAngle);
+                    _leftCandidate = _availableTargets[k].LockOnTransform;
+                }
 
                 if (distanceFromTarget < shortestDistance)
                 {
                     shortestDistance = distanceFromTarget;
                     _nearestLockOnTarget = _availableTargets[k].LockOnTransform;
                 }
-                
-                if (_inputHandler.LockOnFlag)
+            }
+
+            if (_inputHandler.LockOnFlag)
+            {
+                if (_inputHandler.LockOnRightFlag)
                 {
-                    Vector3 lockTargetDirection = _availableTargets[k].transform.position - _cameraTransform.position;
-                    Vector3 viewDirection = _cameraTransform.forward;
-                    lockTargetDirection.y = 0;
-                    viewDirection.y = 0;
-                    float relativeAngle = Vector3.SignedAngle(viewDirection, lockTargetDirection, Vector3.up);
-
-                    if (relativeAngle < 0.00f)
-                    {
-                        _leftLockTarget = _availableTargets[k].LockOnTransform;
-                    }
-
-                    if (relativeAngle > 0.00f)
-                    {
-                        _rightLockTarget = _availableTargets[k].LockOnTransform;
-                    }
+                    Debug.Log("right");
+                    _rightLockTarget = _rightCandidate;
                 }
+
+                if (_inputHandler.LockOnLeftFlag)
+                {
+                    Debug.Log("left");
+                    _leftLockTarget = _leftCandidate;
+                }
+
             }
         }
 

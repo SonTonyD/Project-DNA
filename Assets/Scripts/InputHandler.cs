@@ -35,6 +35,11 @@ namespace DNA
         private bool _right_Stick_Left_Input;
         [SerializeField]
         private bool _lockOnFlag;
+        [SerializeField]
+        private bool _lockOnRightFlag;
+        [SerializeField]
+        private bool _lockOnLeftFlag;
+
 
         private PlayerControl _inputActions;
         [SerializeField]
@@ -51,7 +56,8 @@ namespace DNA
         public float MouseX { get => _mouseX; set => _mouseX = value; }
         public float MouseY { get => _mouseY; set => _mouseY = value; }
         public bool LockOnFlag { get => _lockOnFlag; set => _lockOnFlag = value; }
-
+        public bool LockOnRightFlag { get => _lockOnRightFlag; set => _lockOnRightFlag = value; }
+        public bool LockOnLeftFlag { get => _lockOnLeftFlag; set => _lockOnLeftFlag = value; }
 
         private void Start()
         {
@@ -83,7 +89,7 @@ namespace DNA
             MoveInput(delta);
             HandleJumpInput(delta);
             HandleSprintInput(delta);
-            HandleLockOnInput();
+            HandleLockOnInput(delta);
         }
 
         private void MoveInput(float delta)
@@ -122,12 +128,12 @@ namespace DNA
             }
         }
 
-        private void HandleLockOnInput()
+        private void HandleLockOnInput(float delta)
         {
             if (_lockOnInput && _lockOnFlag == false)
             {
                 _lockOnInput = false;
-                _cameraHandler.HandleLockOn();
+                _cameraHandler.HandleLockOn(delta);
 
                 if (_cameraHandler.NearestLockOnTarget != null)
                 {
@@ -144,24 +150,28 @@ namespace DNA
 
             if (_lockOnFlag && _right_Stick_Left_Input)
             {
+                _lockOnLeftFlag = true;
                 _right_Stick_Left_Input = false;
-                _cameraHandler.HandleLockOn();
+                _cameraHandler.HandleLockOn(delta);
 
                 if (_cameraHandler.LeftLockTarget != null)
                 {
                     _cameraHandler.CurrentLockOnTarget = _cameraHandler.LeftLockTarget;
                 }
+                _lockOnLeftFlag = false;
             }
 
             if (_lockOnFlag && _right_Stick_Right_Input)
             {
+                _lockOnRightFlag = true;
                 _right_Stick_Right_Input = false;
-                _cameraHandler.HandleLockOn();
+                _cameraHandler.HandleLockOn(delta);
 
                 if (_cameraHandler.RightLockTarget != null)
                 {
                     _cameraHandler.CurrentLockOnTarget = _cameraHandler.RightLockTarget;
                 }
+                _lockOnRightFlag = false;
             }
         }
     }
