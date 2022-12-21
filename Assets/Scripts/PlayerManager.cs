@@ -29,6 +29,7 @@ namespace DNA
             {
                 _cameraHandler.FollowTarget(delta);
                 _cameraHandler.HandleCameraRotation(delta, _inputHandler.MouseX, _inputHandler.MouseY);
+                _cameraHandler.UpdateAvailableTargets(delta);
             }
 
             _playerMovement.GroundedCheck();

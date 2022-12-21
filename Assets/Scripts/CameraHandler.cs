@@ -152,7 +152,7 @@ namespace DNA
             _cameraTransform.localPosition = _cameraTransformPosition;
         }
 
-        public void HandleLockOn(float delta)
+        public void UpdateAvailableTargets(float delta)
         {
             float shortestDistance = Mathf.Infinity;
 
@@ -170,8 +170,8 @@ namespace DNA
                     RaycastHit hit;
 
                     if (character.transform.root != _targetTransform.transform.root && viewableAngle > -50 && viewableAngle < 50 && distanceFromTarget <= _maximumLockOnDistance)
-                    { 
-                        
+                    {
+
                         if (Physics.Linecast(_playerManager.LockOnTransform.position, character.LockOnTransform.position, out hit))
                         {
                             Debug.DrawLine(_playerManager.LockOnTransform.position, character.LockOnTransform.position);
@@ -200,13 +200,13 @@ namespace DNA
                 float relativeAngle = Vector3.SignedAngle(viewDirection, lockTargetDirection, Vector3.up);
                 float distanceFromTarget = Vector3.Distance(_targetTransform.position, _availableTargets[k].transform.position);
 
-                if (relativeAngle > 0.0f && Mathf.Abs(relativeAngle) < shortestRightAngle)
+                if (relativeAngle > 0.0f && Mathf.Abs(relativeAngle) < shortestRightAngle && _availableTargets[k].LockOnTransform != _currentLockOnTarget)
                 {
                     shortestRightAngle = Mathf.Abs(relativeAngle);
                     _rightCandidate = _availableTargets[k].LockOnTransform;
                 }
 
-                if (relativeAngle < 0.0f && Mathf.Abs(relativeAngle) < shortestLeftAngle)
+                if (relativeAngle < 0.0f && Mathf.Abs(relativeAngle) < shortestLeftAngle && _availableTargets[k].LockOnTransform != _currentLockOnTarget)
                 {
                     shortestLeftAngle = Mathf.Abs(relativeAngle);
                     _leftCandidate = _availableTargets[k].LockOnTransform;
@@ -218,7 +218,10 @@ namespace DNA
                     _nearestLockOnTarget = _availableTargets[k].LockOnTransform;
                 }
             }
+        }
 
+        public void HandleLockOn(float delta)
+        {
             if (_inputHandler.LockOnFlag)
             {
                 if (_inputHandler.LockOnRightFlag)
