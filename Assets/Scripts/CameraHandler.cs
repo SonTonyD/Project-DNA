@@ -175,7 +175,7 @@ namespace DNA
 
             for (int i = 0; i < colliders.Length; i++)
             {
-                CharacterManager character = colliders[i].GetComponent<CharacterManager>();
+                EnemyManager character = colliders[i].GetComponent<EnemyManager>();
 
                 if (character != null)
                 {
@@ -264,5 +264,3 @@ namespace DNA
         }
     }
 }
-
-

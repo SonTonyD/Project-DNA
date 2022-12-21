@@ -40,7 +40,6 @@ namespace DNA
         [SerializeField]
         private bool _lockOnLeftFlag;
 
-
         private PlayerControl _inputActions;
         [SerializeField]
         private CameraHandler _cameraHandler;
@@ -58,6 +57,7 @@ namespace DNA
         public bool LockOnFlag { get => _lockOnFlag; set => _lockOnFlag = value; }
         public bool LockOnRightFlag { get => _lockOnRightFlag; set => _lockOnRightFlag = value; }
         public bool LockOnLeftFlag { get => _lockOnLeftFlag; set => _lockOnLeftFlag = value; }
+
 
         private void Start()
         {
@@ -176,4 +176,3 @@ namespace DNA
         }
     }
 }
-
