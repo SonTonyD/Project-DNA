@@ -11,6 +11,7 @@ namespace DNA
 		private bool _isPushEnabled;
 		[Range(0.5f, 5f)] public float strength = 1.1f;
 
+
 		private void OnControllerColliderHit(ControllerColliderHit hit)
 		{
 			if (_isPushEnabled) PushRigidBodies(hit);

@@ -1,7 +1,7 @@
 ---
 name: Pull request
 about: Create a pull request to take into account your work
-title: "[Pull Request]"
+title: "[Feature, Fix, Refactor or Other]"
 assignees: Dinh-SM, SonTonyD
 
 ---

@@ -12,6 +12,12 @@ namespace DNA
         private CameraHandler _cameraHandler;
         private PlayerMovement _playerMovement;
         private const float _HeightComputeConstant = 0.15f;
+        private const float _defaultSlopeLimit = 45f;
+        private const float _defaultStepOffset = 0.1f;
+        private const float _defaultSkinWidth = 0.08f;
+        private const float _defaultMinMoveDistance = 0.001f;
+        private const float _defaultRadius = 0.2f;
+
 
         void Start()
         {
@@ -20,7 +26,7 @@ namespace DNA
             _cameraHandler = CameraHandler.singleton;
             _playerMovement = GetComponent<PlayerMovement>();
 
-            SetCharacterHeightFromModel();
+            InitializeCharacterController();
         }
 
         void Update()
@@ -39,14 +45,22 @@ namespace DNA
             _playerMovement.HandleMovement(delta);
         }
 
-        private void SetCharacterHeightFromModel()
+        private void InitializeCharacterController()
         {
             CharacterController controller = _playerMovement.GetComponent<CharacterController>();
+
+            #region Height Computation
             SkinnedMeshRenderer mesh = transform.GetComponentInChildren<SkinnedMeshRenderer>();
             controller.height = mesh.bounds.center.y + mesh.bounds.extents.y - _HeightComputeConstant;
             float controllerCenterY = (mesh.bounds.center.y + mesh.bounds.extents.y) / 2;
             controller.center = new Vector3(0, controllerCenterY, 0);
+            #endregion
+
+            controller.slopeLimit = _defaultSlopeLimit;
+            controller.stepOffset = _defaultStepOffset;
+            controller.skinWidth = _defaultSkinWidth;
+            controller.minMoveDistance = _defaultMinMoveDistance;
+            controller.radius = _defaultRadius;
         }
     }
 }
-
