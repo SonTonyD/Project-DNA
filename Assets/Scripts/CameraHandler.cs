@@ -77,20 +77,20 @@ namespace DNA
             _cameraTransform.position = new Vector3(0, 0, -3.5f);
             _cameraTransform.rotation = Quaternion.Euler(new Vector3(-10, 0, 0));
 
-            CharacterController controller = _targetTransform.GetComponent<CharacterController>();
-            _cameraPivotYOffset = controller.height - _CameraPivotYOffsetConstant;
-
-            _cameraPivotTransform.position = new Vector3(0, _cameraPivotYOffset, -0.025f);
             _defaultPosition = _cameraTransform.localPosition.z;
             _ignoreLayers = ~(1 << 8 | 1 << 11 | 1 << 10);
             _inputHandler = FindObjectOfType<InputHandler>();
-            _playerManager = FindObjectOfType<PlayerManager>();
             Cursor.lockState = CursorLockMode.Locked;
         }
 
         private void Start()
         {
             _environmentLayer = LayerMask.NameToLayer("Floor");
+
+            _playerManager = FindObjectOfType<PlayerManager>();
+            CharacterController controller = _targetTransform.GetComponent<CharacterController>();
+            _cameraPivotYOffset = controller.height - _CameraPivotYOffsetConstant;
+            _cameraPivotTransform.position = new Vector3(-0.025f, _cameraPivotYOffset, -0.025f);
         }
 
         public void FollowTarget(float delta)

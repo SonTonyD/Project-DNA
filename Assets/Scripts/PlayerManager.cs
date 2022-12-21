@@ -19,14 +19,18 @@ namespace DNA
         private const float _defaultRadius = 0.2f;
 
 
-        void Start()
+        private void Awake()
         {
             _inputHandler = GetComponent<InputHandler>();
             _anim = GetComponentInChildren<Animator>();
-            _cameraHandler = CameraHandler.singleton;
             _playerMovement = GetComponent<PlayerMovement>();
 
             InitializeCharacterController();
+        }
+
+        void Start()
+        {
+            _cameraHandler = CameraHandler.singleton;
         }
 
         void Update()
