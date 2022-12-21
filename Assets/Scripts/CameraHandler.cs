@@ -49,6 +49,8 @@ namespace DNA
         private float _minimumCameraOffset = 0.5f;
         [SerializeField]
         private float _maximumLockOnDistance = 30;
+        [SerializeField]
+        private float _availableTargetRadius = 26;
 
         private Transform _currentLockOnTarget;
         private List<CharacterManager> _availableTargets = new List<CharacterManager>();
@@ -154,9 +156,13 @@ namespace DNA
 
         public void UpdateAvailableTargets(float delta)
         {
-            float shortestDistance = Mathf.Infinity;
-
-            Collider[] colliders = Physics.OverlapSphere(_targetTransform.position, 26);
+            FindAvailableTargets();
+            UpdateLockOnParameters();
+        }
+        
+        private void FindAvailableTargets()
+        {
+            Collider[] colliders = Physics.OverlapSphere(_targetTransform.position, _availableTargetRadius);
 
             for (int i = 0; i < colliders.Length; i++)
             {
@@ -188,7 +194,12 @@ namespace DNA
                     }
                 }
             }
+        }
 
+        //Function that finds the left and right candidate for target change and finds the nearest target to lock
+        private void UpdateLockOnParameters()
+        {
+            float shortestDistance = Mathf.Infinity;
             float shortestRightAngle = Mathf.Infinity;
             float shortestLeftAngle = Mathf.Infinity;
             for (int k = 0; k < _availableTargets.Count; k++)
@@ -226,16 +237,13 @@ namespace DNA
             {
                 if (_inputHandler.LockOnRightFlag)
                 {
-                    Debug.Log("right");
                     _rightLockTarget = _rightCandidate;
                 }
 
                 if (_inputHandler.LockOnLeftFlag)
                 {
-                    Debug.Log("left");
                     _leftLockTarget = _leftCandidate;
                 }
-
             }
         }
 
