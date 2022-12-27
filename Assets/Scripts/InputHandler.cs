@@ -57,7 +57,7 @@ namespace DNA
         public bool LockOnFlag { get => _lockOnFlag; set => _lockOnFlag = value; }
         public bool LockOnRightFlag { get => _lockOnRightFlag; set => _lockOnRightFlag = value; }
         public bool LockOnLeftFlag { get => _lockOnLeftFlag; set => _lockOnLeftFlag = value; }
-
+        public PlayerControl InputActions { get => _inputActions; set => _inputActions = value; }
 
         private void Start()
         {

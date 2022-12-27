@@ -16,7 +16,7 @@ namespace DNA
         private const float _defaultStepOffset = 0.1f;
         private const float _defaultSkinWidth = 0.08f;
         private const float _defaultMinMoveDistance = 0.001f;
-        private const float _defaultRadius = 0.2f;
+        private const float _defaultRadius = 0.3f;
 
 
         private void Awake()
