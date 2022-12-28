@@ -8,12 +8,15 @@ namespace DNA
     public class AnimatorHandler : MonoBehaviour
     {
         private Animator _anim;
+        private PlayerMovement _playerMovement;
         [SerializeField]
         private int _vertical;
         [SerializeField]
         private int _horizontal;
         [SerializeField]
         private bool _isRotationEnabled;
+        [SerializeField]
+        private bool _isUsingRootMotion;
 
         private int _jumpID;
         private int _groundedID;
@@ -27,6 +30,7 @@ namespace DNA
         {
             _isRotationEnabled = true;
             _anim = GetComponent<Animator>();
+            _playerMovement = GetComponent<PlayerMovement>();
             _vertical = Animator.StringToHash("Vertical");
             _horizontal = Animator.StringToHash("Horizontal");
             _jumpID = Animator.StringToHash("Jump");
@@ -100,10 +104,11 @@ namespace DNA
             _anim.SetFloat(_horizontal, h, 0.1f, Time.deltaTime);
         }
 
-        public void PlayerTargetAnimation(string targetAnim, bool isInteracting)
+        public void PlayerTargetAnimation(string targetAnim, bool isInteracting, bool isUsingRootMotion = false)
         {
             _anim.applyRootMotion = isInteracting;
             _anim.SetBool("isInteracting", isInteracting);
+            _anim.SetBool("isUsingRootMotion", isUsingRootMotion);
             _anim.CrossFade(targetAnim, 0.2f);
         }
 
@@ -115,6 +120,17 @@ namespace DNA
         public void StopRotate()
         {
             _isRotationEnabled = false;
+        }
+
+        private void OnAnimatorMove()
+        {
+            if (_isUsingRootMotion)
+            {
+                Vector3 deltaPosition = _anim.deltaPosition;
+                //deltaPosition.y = 0;
+                Vector3 velocity = deltaPosition / Time.deltaTime;
+                _playerMovement.Controller.velocity.Set(velocity.x, velocity.y, velocity.z);
+            }
         }
 
         private void OnFootstep(AnimationEvent animationEvent)

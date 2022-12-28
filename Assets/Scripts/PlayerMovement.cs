@@ -47,6 +47,10 @@ namespace DNA
         [SerializeField]
         private float sprintSpeed = 12.0f;
 
+        private Vector3 _normalVector;
+
+        public CharacterController Controller { get => _controller; set => _controller = value; }
+
 
         void Start()
         {
@@ -60,7 +64,7 @@ namespace DNA
         }
 
         #region Movement
-        Vector3 normalVector;
+
         private void HandleRotation(float delta)
         {
             Vector3 targetDir = Vector3.zero;
@@ -102,7 +106,7 @@ namespace DNA
 
             _moveDirection *= speed;
 
-            Vector3 projectedVelocity = Vector3.ProjectOnPlane(_moveDirection, normalVector);
+            Vector3 projectedVelocity = Vector3.ProjectOnPlane(_moveDirection, _normalVector);
             _controller.Move(_moveDirection.normalized * (speed * delta) + new Vector3(0.0f, _verticalVelocity, 0.0f) * delta);
 
             _animatorHandler.UpdateAnimatorValues(_inputHandler.MoveAmount, 0);
@@ -147,6 +151,15 @@ namespace DNA
             if (_animatorHandler.Anim.GetBool("isInteracting"))
             {
                 return;
+            }
+        }
+
+        public void HandleDodge(float delta)
+        {
+            if (_inputHandler.DodgeFlag)
+            {
+                // Invulnerability frames
+                // Set animation having exit time and using its root motion to move the player
             }
         }
 
