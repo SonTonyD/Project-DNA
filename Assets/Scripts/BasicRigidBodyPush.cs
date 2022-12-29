@@ -9,7 +9,9 @@ namespace DNA
 		
 		[SerializeField]
 		private bool _isPushEnabled;
-		[Range(0.5f, 5f)] public float strength = 1.1f;
+
+		[SerializeField]
+		[Range(0.5f, 5f)] public float _strength = 1.1f;
 
 
 		private void OnControllerColliderHit(ControllerColliderHit hit)
@@ -34,7 +36,7 @@ namespace DNA
 			Vector3 pushDirection = new Vector3(hit.moveDirection.x, 0.0f, hit.moveDirection.z);
 
 			// Apply the push and take strength into account
-			rigidBody.AddForce(pushDirection * strength, ForceMode.Impulse);
+			rigidBody.AddForce(pushDirection * _strength, ForceMode.Impulse);
 		}
 	}
 }

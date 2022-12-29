@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028334, g: 0.2257134, b: 0.30692226, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -645,6 +645,7 @@ GameObject:
   - component: {fileID: 206747146}
   - component: {fileID: 206747140}
   - component: {fileID: 206747145}
+  - component: {fileID: 206747147}
   m_Layer: 10
   m_Name: Player
   m_TagString: Untagged
@@ -671,16 +672,16 @@ MonoBehaviour:
   _isGrounded: 0
   _GroundLayers:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 0
   _GroundedOffset: -0.08
   _verticalVelocity: 0
-  _terminalVelocity: 53
+  _terminalVelocity: 50
   _didSecondJump: 0
-  movementSpeed: 8
-  rotationSpeed: 10
-  jumpHeight: 1.8
-  gravity: -15
-  sprintSpeed: 12
+  _movementSpeed: 8
+  _rotationSpeed: 10
+  _jumpHeight: 2
+  _gravity: -15
+  _sprintSpeed: 12
 --- !u!114 &206747141
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -702,13 +703,15 @@ MonoBehaviour:
   _jumpFlag: 0
   _leftTrigger_Input: 0
   _sprintFlag: 0
+  _dodgeFlag: 0
   _lockOnInput: 0
-  _right_Stick_Right_Input: 0
-  _right_Stick_Left_Input: 0
+  _rightStick_Right_Input: 0
+  _rightStick_Left_Input: 0
   _lockOnFlag: 0
   _lockOnRightFlag: 0
   _lockOnLeftFlag: 0
   _cameraHandler: {fileID: 0}
+  _isMoveDisabled: 0
 --- !u!4 &206747144
 Transform:
   m_ObjectHideFlags: 0
@@ -757,6 +760,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _lockOnTransform: {fileID: 1282573166}
+--- !u!114 &206747147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206747139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 082e91e165b28f3438156885d1ae8312, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _pushLayers:
+    serializedVersion: 2
+    m_Bits: 1
+  _isPushEnabled: 1
+  strength: 1.1
 --- !u!1 &251463553
 GameObject:
   m_ObjectHideFlags: 0
@@ -882,6 +902,7 @@ MonoBehaviour:
   _minimumCameraOffset: 0.2
   _maximumLockOnDistance: 30
   _availableTargetRadius: 26
+  _cameraPivotYOffset: 0
 --- !u!1 &487994119
 GameObject:
   m_ObjectHideFlags: 0
@@ -1032,6 +1053,7 @@ MonoBehaviour:
   _vertical: 0
   _horizontal: 0
   _isRotationEnabled: 1
+  _isUsingRootMotion: 0
 --- !u!1 &847676970
 GameObject:
   m_ObjectHideFlags: 0

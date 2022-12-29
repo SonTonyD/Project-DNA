@@ -25,9 +25,9 @@ namespace DNA
         [SerializeField]
         private bool _isGrounded;
         [SerializeField]
-        private LayerMask _GroundLayers;
+        private LayerMask _groundLayers;
         [SerializeField]
-        private float _GroundedOffset = -0.08f;
+        private float _groundedOffset = -0.08f;
         [SerializeField]
         private float _verticalVelocity;
         [SerializeField]
@@ -35,17 +35,22 @@ namespace DNA
         [SerializeField]
         private bool _didSecondJump = false;
 
+        [SerializeField]
+        private bool _isDodging = false;
+
         [Header("Stats")]
         [SerializeField]
-        private float movementSpeed = 8.0f;
+        private float _movementSpeed = 8.0f;
         [SerializeField]
-        private float rotationSpeed = 10.0f;
+        private float _rotationSpeed = 10.0f;
         [SerializeField]
-        private float jumpHeight = 2f;
+        private float _jumpHeight = 2f;
         [SerializeField]
-        private float gravity = -15.0f;
+        private float _gravity = -15.0f;
         [SerializeField]
-        private float sprintSpeed = 12.0f;
+        private float _sprintSpeed = 12.0f;
+        [SerializeField]
+        private float _speedModulation = 0f;
 
         private Vector3 _normalVector;
 
@@ -60,7 +65,7 @@ namespace DNA
             _cameraObject = Camera.main.transform;
             _myTransform = transform;
             _animatorHandler.Initialize();
-            _GroundLayers = LayerMask.GetMask("Floor");
+            _groundLayers = LayerMask.GetMask("Floor");
         }
 
         #region Movement
@@ -81,7 +86,7 @@ namespace DNA
                 targetDir = _myTransform.forward;
             }
 
-            float rs = rotationSpeed;
+            float rs = _rotationSpeed;
 
             Quaternion tr = Quaternion.LookRotation(targetDir);
             Quaternion targetRotation = Quaternion.Slerp(_myTransform.rotation, tr, rs * delta);
@@ -97,17 +102,29 @@ namespace DNA
             _moveDirection.Normalize();
             _moveDirection.y = 0;
 
-            float speed = movementSpeed;
+            float speed = _movementSpeed;
+
+            if ((Mathf.Abs(_inputHandler.Vertical) > 0.5 && Mathf.Abs(_inputHandler.Horizontal) > 0.5) ||
+                Mathf.Max(Mathf.Abs(_inputHandler.Vertical), Mathf.Abs(_inputHandler.Horizontal)) > 0.85)
+            {
+                _speedModulation = 1;
+            }
+            else
+            {
+                _speedModulation = Mathf.Max(Mathf.Abs(_inputHandler.Vertical), Mathf.Abs(_inputHandler.Horizontal));
+            }
+            _speedModulation = Mathf.Max(_speedModulation, 0.15f);
 
             if (_inputHandler.SprintFlag)
             {
-                speed = sprintSpeed;
+                speed = _sprintSpeed;
+                _speedModulation = 1;
             }
 
             _moveDirection *= speed;
 
             Vector3 projectedVelocity = Vector3.ProjectOnPlane(_moveDirection, _normalVector);
-            _controller.Move(_moveDirection.normalized * (speed * delta) + new Vector3(0.0f, _verticalVelocity, 0.0f) * delta);
+            _controller.Move(_moveDirection.normalized * (speed * _speedModulation * delta) + new Vector3(0.0f, _verticalVelocity, 0.0f) * delta);
 
             _animatorHandler.UpdateAnimatorValues(_inputHandler.MoveAmount, 0);
 
@@ -129,7 +146,7 @@ namespace DNA
 
             if ((_inputHandler.JumpFlag && _isGrounded) || (_inputHandler.JumpFlag && !_didSecondJump && !_isGrounded))
             {
-                _verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
                 
                 if (_didSecondJump )
                 {
@@ -145,7 +162,7 @@ namespace DNA
 
             if (_verticalVelocity < _terminalVelocity)
             {
-                _verticalVelocity += gravity * delta;
+                _verticalVelocity += _gravity * delta;
             }
 
             if (_animatorHandler.Anim.GetBool("isInteracting"))
@@ -156,19 +173,36 @@ namespace DNA
 
         public void HandleDodge(float delta)
         {
-            if (_inputHandler.DodgeFlag)
+            if (_inputHandler.DodgeFlag && !_isDodging)
             {
                 // Invulnerability frames
                 // Set animation having exit time and using its root motion to move the player
+
+                _moveDirection = _cameraObject.forward * _inputHandler.Vertical;
+                _moveDirection += _cameraObject.right * _inputHandler.Horizontal;
+
+                // Do animation
+                //_moveDirection.y = 0;
+                //Quaternion rollRotation = Quaternion.LookRotation(_moveDirection);
+                //_myTransform.rotation = rollRotation;
+                _isDodging = true;
+                Debug.Log("Dodging");
+                // Wait for dodge animation end to reset _isDodging
+                Invoke(nameof(ResetDodge), 2); // temporary
             }
+        }
+
+        private void ResetDodge()
+        {
+            _isDodging = false;
         }
 
         public void GroundedCheck()
         {
             // set sphere position, with offset
-            Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - _GroundedOffset,
+            Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - _groundedOffset,
                 transform.position.z);
-            _isGrounded = Physics.CheckSphere(spherePosition, _controller.radius, _GroundLayers,
+            _isGrounded = Physics.CheckSphere(spherePosition, _controller.radius, _groundLayers,
                 QueryTriggerInteraction.Ignore);
 
             if (_isGrounded)

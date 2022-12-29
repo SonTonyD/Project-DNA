@@ -12,11 +12,11 @@ namespace DNA
         private CameraHandler _cameraHandler;
         private PlayerMovement _playerMovement;
         private const float _HeightComputeConstant = 0.15f;
-        private const float _defaultSlopeLimit = 45f;
-        private const float _defaultStepOffset = 0.1f;
-        private const float _defaultSkinWidth = 0.08f;
-        private const float _defaultMinMoveDistance = 0.001f;
-        private const float _defaultRadius = 0.2f;
+        private const float _DefaultSlopeLimit = 45f;
+        private const float _DefaultStepOffset = 0.1f;
+        private const float _DefaultSkinWidth = 0.08f;
+        private const float _DefaultMinMoveDistance = 0.001f;
+        private const float _DefaultRadius = 0.2f;
 
 
         private void Awake()
@@ -41,7 +41,6 @@ namespace DNA
             {
                 _cameraHandler.FollowTarget(delta);
                 _cameraHandler.HandleCameraRotation(delta, _inputHandler.MouseX, _inputHandler.MouseY);
-                _cameraHandler.UpdateAvailableTargets(delta);
             }
 
             _playerMovement.GroundedCheck();
@@ -61,11 +60,11 @@ namespace DNA
             controller.center = new Vector3(0, controllerCenterY, 0);
             #endregion
 
-            controller.slopeLimit = _defaultSlopeLimit;
-            controller.stepOffset = _defaultStepOffset;
-            controller.skinWidth = _defaultSkinWidth;
-            controller.minMoveDistance = _defaultMinMoveDistance;
-            controller.radius = _defaultRadius;
+            controller.slopeLimit = _DefaultSlopeLimit;
+            controller.stepOffset = _DefaultStepOffset;
+            controller.skinWidth = _DefaultSkinWidth;
+            controller.minMoveDistance = _DefaultMinMoveDistance;
+            controller.radius = _DefaultRadius;
         }
     }
 }

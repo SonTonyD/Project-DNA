@@ -104,7 +104,7 @@ namespace DNA
             _anim.SetFloat(_horizontal, h, 0.1f, Time.deltaTime);
         }
 
-        public void PlayerTargetAnimation(string targetAnim, bool isInteracting, bool isUsingRootMotion = false)
+        public void PlayTargetAnimation(string targetAnim, bool isInteracting, bool isUsingRootMotion = false)
         {
             _anim.applyRootMotion = isInteracting;
             _anim.SetBool("isInteracting", isInteracting);
@@ -120,17 +120,6 @@ namespace DNA
         public void StopRotate()
         {
             _isRotationEnabled = false;
-        }
-
-        private void OnAnimatorMove()
-        {
-            if (_isUsingRootMotion)
-            {
-                Vector3 deltaPosition = _anim.deltaPosition;
-                //deltaPosition.y = 0;
-                Vector3 velocity = deltaPosition / Time.deltaTime;
-                _playerMovement.Controller.velocity.Set(velocity.x, velocity.y, velocity.z);
-            }
         }
 
         private void OnFootstep(AnimationEvent animationEvent)

@@ -121,20 +121,20 @@ namespace DNA
             } 
             else
             {
-                Vector3 dir = _currentLockOnTarget.position - transform.position;
-                dir.Normalize();
-                dir.y = 0;
+                Vector3 direction = _currentLockOnTarget.position - transform.position;
+                direction.Normalize();
+                direction.y = 0;
 
-                Quaternion targetRotation = Quaternion.LookRotation(dir);
+                Quaternion targetRotation = Quaternion.LookRotation(direction);
 
                 //transform.rotation = targetRotation;
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, delta / _switchTargetSpeed);
                 
 
-                dir = _currentLockOnTarget.position - _cameraPivotTransform.position;
-                dir.Normalize();
+                direction = _currentLockOnTarget.position - _cameraPivotTransform.position;
+                direction.Normalize();
 
-                targetRotation = Quaternion.LookRotation(dir);
+                targetRotation = Quaternion.LookRotation(direction);
                 Vector3 eulerAngle = targetRotation.eulerAngles;
                 eulerAngle.y = 0;
                 _cameraPivotTransform.localEulerAngles = eulerAngle;
@@ -244,6 +244,7 @@ namespace DNA
         {
             if (_inputHandler.LockOnFlag)
             {
+                UpdateAvailableTargets(delta);
                 if (_inputHandler.LockOnRightFlag)
                 {
                     _rightLockTarget = _rightCandidate;
