@@ -119,10 +119,7 @@ namespace DNA
         public void HandleJumping(float delta)
         {
             RaycastHit hit;
-
-            bool isAtJumpingHeight = !(Physics.Linecast(_myTransform.position, _myTransform.position - new Vector3(0, _minimalJumpingHeight, 0), out hit) 
-                && hit.transform.gameObject.layer == LayerMask.NameToLayer("Floor"));
-            Debug.DrawLine(_myTransform.position, _myTransform.position - new Vector3(0, _minimalJumpingHeight, 0));
+            //Debug.DrawLine(_myTransform.position, _myTransform.position - new Vector3(0, _minimalJumpingHeight, 0));
 
             _animatorHandler.SetGroundedAnimation(_isGrounded);
             _animatorHandler.SetJumpAnimation(_inputHandler.JumpFlag);
@@ -131,12 +128,17 @@ namespace DNA
             {
                 _didSecondJump = false;
                 _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
-
             }
-            else if (_inputHandler.JumpFlag && !_isGrounded && _didSecondJump == false && isAtJumpingHeight)
+            else if (_inputHandler.JumpFlag && !_isGrounded && _didSecondJump == false)
             {
-                _didSecondJump = true;
-                _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
+                bool isAtJumpingHeight = !(Physics.Linecast(_myTransform.position, _myTransform.position - new Vector3(0, _minimalJumpingHeight, 0), out hit) 
+                    && hit.transform.gameObject.layer == LayerMask.NameToLayer("Floor"));
+
+                if (isAtJumpingHeight)
+                {
+                    _didSecondJump = true;
+                    _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
+                }
             }
 
             if (_isGrounded)
