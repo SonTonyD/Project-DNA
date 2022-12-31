@@ -25,27 +25,29 @@ namespace DNA
         [SerializeField]
         private bool _isGrounded;
         [SerializeField]
-        private LayerMask _GroundLayers;
+        private LayerMask _groundLayers;
         [SerializeField]
-        private float _GroundedOffset = -0.08f;
+        private float _groundedOffset = -0.08f;
+        [SerializeField]
+        private bool _didSecondJump = false;
         [SerializeField]
         private float _verticalVelocity;
         [SerializeField]
         private float _terminalVelocity = 50.0f;
         [SerializeField]
-        private bool _didSecondJump = false;
+        private float _minimalJumpingHeight = 0.3f;
 
         [Header("Stats")]
         [SerializeField]
-        private float movementSpeed = 8.0f;
+        private float _movementSpeed = 8.0f;
         [SerializeField]
-        private float rotationSpeed = 10.0f;
+        private float _rotationSpeed = 10.0f;
         [SerializeField]
-        private float jumpHeight = 2f;
+        private float _jumpHeight = 2f;
         [SerializeField]
-        private float gravity = -15.0f;
+        private float _gravity = -15.0f;
         [SerializeField]
-        private float sprintSpeed = 12.0f;
+        private float _sprintSpeed = 12.0f;
 
 
         void Start()
@@ -56,7 +58,7 @@ namespace DNA
             _cameraObject = Camera.main.transform;
             _myTransform = transform;
             _animatorHandler.Initialize();
-            _GroundLayers = LayerMask.GetMask("Floor");
+            _groundLayers = LayerMask.GetMask("Floor");
         }
 
         #region Movement
@@ -77,7 +79,7 @@ namespace DNA
                 targetDir = _myTransform.forward;
             }
 
-            float rs = rotationSpeed;
+            float rs = _rotationSpeed;
 
             Quaternion tr = Quaternion.LookRotation(targetDir);
             Quaternion targetRotation = Quaternion.Slerp(_myTransform.rotation, tr, rs * delta);
@@ -93,16 +95,17 @@ namespace DNA
             _moveDirection.Normalize();
             _moveDirection.y = 0;
 
-            float speed = movementSpeed;
+            float speed = _movementSpeed;
 
             if (_inputHandler.SprintFlag)
             {
-                speed = sprintSpeed;
+                speed = _sprintSpeed;
             }
 
             _moveDirection *= speed;
 
             Vector3 projectedVelocity = Vector3.ProjectOnPlane(_moveDirection, normalVector);
+
             _controller.Move(_moveDirection.normalized * (speed * delta) + new Vector3(0.0f, _verticalVelocity, 0.0f) * delta);
 
             _animatorHandler.UpdateAnimatorValues(_inputHandler.MoveAmount, 0);
@@ -115,53 +118,51 @@ namespace DNA
 
         public void HandleJumping(float delta)
         {
+            RaycastHit hit;
+            //Debug.DrawLine(_myTransform.position, _myTransform.position - new Vector3(0, _minimalJumpingHeight, 0));
+
             _animatorHandler.SetGroundedAnimation(_isGrounded);
             _animatorHandler.SetJumpAnimation(_inputHandler.JumpFlag);
 
-            if (_isGrounded && _verticalVelocity < 0)
+            if (_inputHandler.JumpFlag && _isGrounded)
             {
-                _verticalVelocity = -2f;
+                _didSecondJump = false;
+                _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
             }
-
-            if ((_inputHandler.JumpFlag && _isGrounded) || (_inputHandler.JumpFlag && !_didSecondJump && !_isGrounded))
+            else if (_inputHandler.JumpFlag && !_isGrounded && _didSecondJump == false)
             {
-                _verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
-                
-                if (_didSecondJump )
-                {
-                    _didSecondJump = false;
-                    _inputHandler.JumpFlag = false;
-                }
+                bool isAtJumpingHeight = !(Physics.Linecast(_myTransform.position, _myTransform.position - new Vector3(0, _minimalJumpingHeight, 0), out hit) 
+                    && hit.transform.gameObject.layer == LayerMask.NameToLayer("Floor"));
 
-                if (_inputHandler.JumpFlag && !_didSecondJump)
+                if (isAtJumpingHeight)
                 {
                     _didSecondJump = true;
+                    _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
+                }
+            }
+
+            if (_isGrounded)
+            {
+                _didSecondJump = false;
+                if (_verticalVelocity < 0)
+                {
+                    _verticalVelocity = -2f;
                 }
             }
 
             if (_verticalVelocity < _terminalVelocity)
             {
-                _verticalVelocity += gravity * delta;
-            }
-
-            if (_animatorHandler.Anim.GetBool("isInteracting"))
-            {
-                return;
+                _verticalVelocity += _gravity * delta;
             }
         }
 
         public void GroundedCheck()
         {
             // set sphere position, with offset
-            Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - _GroundedOffset,
+            Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - _groundedOffset,
                 transform.position.z);
-            _isGrounded = Physics.CheckSphere(spherePosition, _controller.radius, _GroundLayers,
+            _isGrounded = Physics.CheckSphere(spherePosition, _controller.radius, _groundLayers,
                 QueryTriggerInteraction.Ignore);
-
-            if (_isGrounded)
-            {
-                _didSecondJump = false;
-            }
         }
 
         #endregion

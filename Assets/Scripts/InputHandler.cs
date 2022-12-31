@@ -58,7 +58,6 @@ namespace DNA
         public bool LockOnRightFlag { get => _lockOnRightFlag; set => _lockOnRightFlag = value; }
         public bool LockOnLeftFlag { get => _lockOnLeftFlag; set => _lockOnLeftFlag = value; }
 
-
         private void Start()
         {
             _cameraHandler = FindObjectOfType<CameraHandler>();
