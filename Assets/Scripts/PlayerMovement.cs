@@ -141,11 +141,12 @@ namespace DNA
             RaycastHit hit;
 
             _animatorHandler.SetGroundedAnimation(_isGrounded);
-            _animatorHandler.SetJumpAnimation(_inputHandler.JumpFlag);
+            _animatorHandler.SetJumpAnimation(false);
 
             if (_inputHandler.JumpFlag && _isGrounded)
             {
                 _didSecondJump = false;
+                _animatorHandler.SetJumpAnimation(true);
                 _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
             }
             else if (_inputHandler.JumpFlag && !_isGrounded && !_didSecondJump)
@@ -157,6 +158,7 @@ namespace DNA
                 if (isAtJumpingHeight)
                 {
                     _didSecondJump = true;
+                    _animatorHandler.SetJumpAnimation(true);
                     _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
                 }
             }
