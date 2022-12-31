@@ -29,11 +29,13 @@ namespace DNA
         [SerializeField]
         private float _groundedOffset = -0.08f;
         [SerializeField]
+        private bool _didSecondJump = false;
+        [SerializeField]
         private float _verticalVelocity;
         [SerializeField]
         private float _terminalVelocity = 50.0f;
         [SerializeField]
-        private bool _didSecondJump = false;
+        private float _minimalJumpingHeight = 0.3f;
 
         [SerializeField]
         private bool _isDodging = false;
@@ -136,38 +138,41 @@ namespace DNA
 
         public void HandleJumping(float delta)
         {
+            RaycastHit hit;
+
             _animatorHandler.SetGroundedAnimation(_isGrounded);
             _animatorHandler.SetJumpAnimation(_inputHandler.JumpFlag);
 
-            if (_isGrounded && _verticalVelocity < 0)
+            if (_inputHandler.JumpFlag && _isGrounded)
             {
-                _verticalVelocity = -2f;
-            }
-
-            if ((_inputHandler.JumpFlag && _isGrounded) || (_inputHandler.JumpFlag && !_didSecondJump && !_isGrounded))
-            {
+                _didSecondJump = false;
                 _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
-                
-                if (_didSecondJump )
-                {
-                    _didSecondJump = false;
-                    _inputHandler.JumpFlag = false;
-                }
+            }
+            else if (_inputHandler.JumpFlag && !_isGrounded && !_didSecondJump)
+            {
+                bool isAtJumpingHeight = !(Physics.Linecast(_myTransform.position, _myTransform.position - new Vector3(0, _minimalJumpingHeight, 0), out hit) 
+                    && hit.transform.gameObject.layer == LayerMask.NameToLayer("Floor"));
+                //Debug.DrawLine(_myTransform.position, _myTransform.position - new Vector3(0, _minimalJumpingHeight, 0));
 
-                if (_inputHandler.JumpFlag && !_didSecondJump)
+                if (isAtJumpingHeight)
                 {
                     _didSecondJump = true;
+                    _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
+                }
+            }
+
+            if (_isGrounded)
+            {
+                _didSecondJump = false;
+                if (_verticalVelocity < 0)
+                {
+                    _verticalVelocity = -2f;
                 }
             }
 
             if (_verticalVelocity < _terminalVelocity)
             {
                 _verticalVelocity += _gravity * delta;
-            }
-
-            if (_animatorHandler.Anim.GetBool("isInteracting"))
-            {
-                return;
             }
         }
 
@@ -204,11 +209,6 @@ namespace DNA
                 transform.position.z);
             _isGrounded = Physics.CheckSphere(spherePosition, _controller.radius, _groundLayers,
                 QueryTriggerInteraction.Ignore);
-
-            if (_isGrounded)
-            {
-                _didSecondJump = false;
-            }
         }
 
         #endregion

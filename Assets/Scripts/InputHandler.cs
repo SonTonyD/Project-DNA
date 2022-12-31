@@ -63,7 +63,6 @@ namespace DNA
         public bool LockOnLeftFlag { get => _lockOnLeftFlag; set => _lockOnLeftFlag = value; }
         public bool DodgeFlag { get => _dodgeFlag; set => _dodgeFlag = value; }
 
-
         private void Start()
         {
             _cameraHandler = FindObjectOfType<CameraHandler>();
