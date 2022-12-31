@@ -147,7 +147,7 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                     ""id"": ""f4fdec20-5e3a-4909-b33e-39ae097b5da8"",
                     ""path"": ""<Mouse>/delta"",
                     ""interactions"": """",
-                    ""processors"": ""NormalizeVector2"",
+                    ""processors"": ""NormalizeVector2,InvertVector2(invertX=false)"",
                     ""groups"": """",
                     ""action"": ""Camera"",
                     ""isComposite"": false,
