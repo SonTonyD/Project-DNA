@@ -138,7 +138,6 @@ namespace DNA
 
         public void HandleJumping(float delta)
         {
-            RaycastHit hit;
 
             _animatorHandler.SetGroundedAnimation(_isGrounded);
             _animatorHandler.SetJumpAnimation(false);
@@ -151,7 +150,7 @@ namespace DNA
             }
             else if (_inputHandler.JumpFlag && !_isGrounded && !_didSecondJump)
             {
-                bool isAtJumpingHeight = !(Physics.Linecast(_myTransform.position, _myTransform.position - new Vector3(0, _minimalJumpingHeight, 0), out hit) 
+                bool isAtJumpingHeight = !(Physics.Linecast(_myTransform.position, _myTransform.position - new Vector3(0, _minimalJumpingHeight, 0), out RaycastHit hit)
                     && hit.transform.gameObject.layer == LayerMask.NameToLayer("Floor"));
                 //Debug.DrawLine(_myTransform.position, _myTransform.position - new Vector3(0, _minimalJumpingHeight, 0));
 

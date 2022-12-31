@@ -21,7 +21,9 @@ namespace DNA
         private bool _jumpFlag;
 
         [SerializeField]
-        private bool _leftTrigger_Input;
+        private bool _isTimerStarted;
+        [SerializeField]
+        private float _walkStartTime;
         [SerializeField]
         private bool _sprintFlag;
 
@@ -131,8 +133,17 @@ namespace DNA
 
         private void HandleSprintInput(float delta)
         {
-            _leftTrigger_Input = _inputActions.PlayerActions.Sprint.IsPressed();
-            if (_leftTrigger_Input)
+            if (_moveAmount == 1 && !_isTimerStarted)
+            {
+                _walkStartTime = Time.time;
+                _isTimerStarted = true;
+            }
+            else if (_moveAmount < 1 && _isTimerStarted)
+            {
+                _isTimerStarted = false;
+            }
+
+            if (Time.time - _walkStartTime >= 5f && _isTimerStarted)
             {
                 _sprintFlag = true;
             }
