@@ -75,11 +75,9 @@ namespace DNA
             if (_inputActions == null)
             {
                 _inputActions = new PlayerControl();
-                _inputActions.PlayerMovement.Movement.performed += inputActions => _movementInput = inputActions.ReadValue<Vector2>();
+                _inputActions.PlayerMovement.Movement.performed += i => _movementInput = i.ReadValue<Vector2>();
                 _inputActions.PlayerMovement.Camera.performed += i => _cameraInput = i.ReadValue<Vector2>();
                 _inputActions.PlayerActions.LockOn.performed += i => _lockOnInput = true;
-                _inputActions.PlayerMovement.LockOnTargetRight.performed += i => _rightStick_Right_Input = true;
-                _inputActions.PlayerMovement.LockOnTargetLeft.performed += i => _rightStick_Left_Input = true;
             }
 
             _inputActions.Enable();
@@ -143,7 +141,7 @@ namespace DNA
                 _isTimerStarted = false;
             }
 
-            if (Time.time - _walkStartTime >= 5f && _isTimerStarted)
+            if (_isTimerStarted && Time.time - _walkStartTime >= 5f)
             {
                 _sprintFlag = true;
             }
@@ -155,7 +153,7 @@ namespace DNA
 
         private void HandleLockOnInput(float delta)
         {
-            if (_lockOnInput && _lockOnFlag == false)
+            if (_lockOnInput && !_lockOnFlag)
             {
                 _lockOnInput = false;
                 _cameraHandler.UpdateAvailableTargets(delta);
@@ -172,6 +170,9 @@ namespace DNA
                 _lockOnFlag = false;
                 _cameraHandler.ClearLockOnTargets();
             }
+
+            _rightStick_Left_Input = _inputActions.PlayerMovement.LockOnTargetLeft.triggered;
+            _rightStick_Right_Input = _inputActions.PlayerMovement.LockOnTargetRight.triggered;
 
             if (_lockOnFlag && _rightStick_Left_Input)
             {

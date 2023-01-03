@@ -62,6 +62,7 @@ namespace DNA
         
         [SerializeField]
         private float _cameraPivotYOffset;
+        private bool _isLockRotationEnded;
         private const float _CameraPivotYOffsetConstant = 0.15f;
 
         public Transform CurrentLockOnTarget { get => _currentLockOnTarget; set => _currentLockOnTarget = value; }
@@ -102,7 +103,7 @@ namespace DNA
 
         public void HandleCameraRotation(float delta, float mouseXInput, float mouseYInput)
         {
-            if (_inputHandler.LockOnFlag == false && _currentLockOnTarget == null)
+            if (!_inputHandler.LockOnFlag && _currentLockOnTarget == null)
             {
                 _lookAngle += (mouseXInput * _horizontalSensitivity) / delta;
                 _pivotAngle += (mouseYInput * _verticalSensitivity) / delta;
@@ -127,9 +128,19 @@ namespace DNA
 
                 Quaternion targetRotation = Quaternion.LookRotation(direction);
 
-                //transform.rotation = targetRotation;
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, delta / _switchTargetSpeed);
-                
+                if (transform.rotation == targetRotation)
+                {
+                    _isLockRotationEnded = true;
+                }
+
+                if (_isLockRotationEnded)
+                {
+                    transform.rotation = targetRotation;
+                }
+                else
+                {
+                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, delta / _switchTargetSpeed);
+                }
 
                 direction = _currentLockOnTarget.position - _cameraPivotTransform.position;
                 direction.Normalize();
@@ -244,6 +255,7 @@ namespace DNA
         {
             if (_inputHandler.LockOnFlag)
             {
+                _isLockRotationEnded = false;
                 UpdateAvailableTargets(delta);
                 if (_inputHandler.LockOnRightFlag)
                 {
@@ -259,9 +271,10 @@ namespace DNA
 
         public void ClearLockOnTargets()
         {
-            _availableTargets.Clear();
             _currentLockOnTarget = null;
             _nearestLockOnTarget = null;
+            _isLockRotationEnded = false;
+            _availableTargets.Clear();
         }
     }
 }
