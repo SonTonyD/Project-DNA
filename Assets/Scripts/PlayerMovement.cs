@@ -34,8 +34,6 @@ namespace DNA
         private float _verticalVelocity;
         [SerializeField]
         private float _terminalVelocity = 50.0f;
-        [SerializeField]
-        private float _minimalJumpingHeight = 0.3f;
 
         [SerializeField]
         private bool _isDodging = false;
@@ -150,16 +148,9 @@ namespace DNA
             }
             else if (_inputHandler.JumpFlag && !_isGrounded && !_didSecondJump)
             {
-                bool isAtJumpingHeight = !(Physics.Linecast(_myTransform.position, _myTransform.position - new Vector3(0, _minimalJumpingHeight, 0), out RaycastHit hit)
-                    && hit.transform.gameObject.layer == LayerMask.NameToLayer("Floor"));
-                //Debug.DrawLine(_myTransform.position, _myTransform.position - new Vector3(0, _minimalJumpingHeight, 0));
-
-                if (isAtJumpingHeight)
-                {
-                    _didSecondJump = true;
-                    _animatorHandler.SetJumpAnimation(true);
-                    _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
-                }
+                _didSecondJump = true;
+                _animatorHandler.SetJumpAnimation(true);
+                _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
             }
 
             if (_isGrounded)

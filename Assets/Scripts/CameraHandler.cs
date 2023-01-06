@@ -24,13 +24,16 @@ namespace DNA
         public static CameraHandler singleton;
 
         [SerializeField]
-        private float _horizontalSensitivity = 0.01f;
+        private float _horizontalSensitivity = 1.0f;
+        [SerializeField]
+        private float _verticalSensitivity = 1.0f;
+
+        private const float _SensitivityMultiplier = 100f;
+
         [SerializeField]
         private float _followSpeed = 0.1f;
         [SerializeField]
         private float _switchTargetSpeed = 0.1f;
-        [SerializeField]
-        private float _verticalSensitivity = 0.01f;
 
         private float _targetPosition;
         private float _defaultPosition;
@@ -42,11 +45,11 @@ namespace DNA
         private float _maximumPivot = 70.0f;
 
         [SerializeField]
-        private float _cameraSphereRadius = 0.3f;
+        private float _cameraSphereRadius = 0.2f;
         [SerializeField]
         private float _cameraCollisionOffset = 0.2f;
         [SerializeField]
-        private float _minimumCameraOffset = 0.5f;
+        private float _minimumCameraOffset = 0.2f;
         [SerializeField]
         private float _maximumLockOnDistance = 30;
         [SerializeField]
@@ -96,7 +99,7 @@ namespace DNA
 
         public void FollowTarget(float delta)
         {
-            Vector3 targetPosition = Vector3.SmoothDamp(_myTransform.position, _targetTransform.position, ref _cameraFollowVelocity, delta / _followSpeed);
+            Vector3 targetPosition = Vector3.SmoothDamp(_myTransform.position, _targetTransform.position, ref _cameraFollowVelocity, _followSpeed);
             _myTransform.position = targetPosition;
             HandleCameraCollisions(delta);
         }
@@ -105,8 +108,8 @@ namespace DNA
         {
             if (!_inputHandler.LockOnFlag && _currentLockOnTarget == null)
             {
-                _lookAngle += (mouseXInput * _horizontalSensitivity) / delta;
-                _pivotAngle += (mouseYInput * _verticalSensitivity) / delta;
+                _lookAngle += (mouseXInput * _horizontalSensitivity * _SensitivityMultiplier) * delta;
+                _pivotAngle += (mouseYInput * _verticalSensitivity * _SensitivityMultiplier) * delta;
                 _pivotAngle = Mathf.Clamp(_pivotAngle, _minimumPivot, _maximumPivot);
 
                 Vector3 rotation = Vector3.zero;
@@ -128,7 +131,7 @@ namespace DNA
 
                 Quaternion targetRotation = Quaternion.LookRotation(direction);
 
-                if (transform.rotation == targetRotation)
+                if (!_isLockRotationEnded && transform.rotation == targetRotation)
                 {
                     _isLockRotationEnded = true;
                 }
@@ -139,7 +142,7 @@ namespace DNA
                 }
                 else
                 {
-                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, delta / _switchTargetSpeed);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _switchTargetSpeed);
                 }
 
                 direction = _currentLockOnTarget.position - _cameraPivotTransform.position;
@@ -170,7 +173,7 @@ namespace DNA
                 _targetPosition = -_minimumCameraOffset;
             }
 
-            _cameraTransformPosition.z = Mathf.Lerp(_cameraTransform.localPosition.z, _targetPosition, delta / 0.2f);
+            _cameraTransformPosition.z = Mathf.Lerp(_cameraTransform.localPosition.z, _targetPosition, 0.2f);
             _cameraTransform.localPosition = _cameraTransformPosition;
         }
 

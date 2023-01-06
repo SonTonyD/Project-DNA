@@ -670,19 +670,20 @@ MonoBehaviour:
   _normalCamera: {fileID: 0}
   _controller: {fileID: 0}
   _isGrounded: 0
-  _GroundLayers:
+  _groundLayers:
     serializedVersion: 2
     m_Bits: 0
-  _GroundedOffset: -0.08
+  _groundedOffset: -0.08
   _didSecondJump: 0
   _verticalVelocity: 0
   _terminalVelocity: 50
-  _didSecondJump: 0
+  _isDodging: 0
   _movementSpeed: 8
   _rotationSpeed: 10
   _jumpHeight: 2
   _gravity: -15
   _sprintSpeed: 12
+  _speedModulation: 0
 --- !u!114 &206747141
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -702,7 +703,8 @@ MonoBehaviour:
   _mouseY: 0
   _a_Input: 0
   _jumpFlag: 0
-  _leftTrigger_Input: 0
+  _isTimerStarted: 0
+  _walkStartTime: 0
   _sprintFlag: 0
   _dodgeFlag: 0
   _lockOnInput: 0
@@ -777,7 +779,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   _isPushEnabled: 1
-  strength: 1.1
+  _strength: 1.1
 --- !u!1 &251463553
 GameObject:
   m_ObjectHideFlags: 0
@@ -892,10 +894,10 @@ MonoBehaviour:
   _environmentLayer:
     serializedVersion: 2
     m_Bits: 0
-  _horizontalSensitivity: 0.01
+  _horizontalSensitivity: 1
   _followSpeed: 0.1
   _switchTargetSpeed: 0.1
-  _verticalSensitivity: 0.01
+  _verticalSensitivity: 1
   _minimumPivot: -30
   _maximumPivot: 70
   _cameraSphereRadius: 0.2
