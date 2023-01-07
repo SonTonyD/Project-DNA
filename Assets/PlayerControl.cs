@@ -147,7 +147,7 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                     ""id"": ""f4fdec20-5e3a-4909-b33e-39ae097b5da8"",
                     ""path"": ""<Mouse>/delta"",
                     ""interactions"": """",
-                    ""processors"": ""NormalizeVector2"",
+                    ""processors"": ""NormalizeVector2,InvertVector2(invertX=false)"",
                     ""groups"": """",
                     ""action"": ""Camera"",
                     ""isComposite"": false,
@@ -212,8 +212,8 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""b3f3f396-c9eb-4eda-bbf6-a0b9c0ebb02d"",
                     ""path"": ""<Gamepad>/rightStick/left"",
-                    ""interactions"": ""Tap(pressPoint=1)"",
-                    ""processors"": ""AxisDeadzone(min=0.1,max=1)"",
+                    ""interactions"": ""Press(pressPoint=0.25)"",
+                    ""processors"": ""AxisDeadzone"",
                     ""groups"": """",
                     ""action"": ""LockOnTargetLeft"",
                     ""isComposite"": false,
@@ -234,8 +234,8 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""e5b3b6e1-bc9d-4dba-b26f-329f8c98e006"",
                     ""path"": ""<Gamepad>/rightStick/right"",
-                    ""interactions"": ""Tap(pressPoint=1)"",
-                    ""processors"": ""AxisDeadzone(min=0.1,max=1)"",
+                    ""interactions"": ""Press(pressPoint=0.25)"",
+                    ""processors"": ""AxisDeadzone"",
                     ""groups"": """",
                     ""action"": ""LockOnTargetRight"",
                     ""isComposite"": false,
@@ -268,18 +268,18 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Sprint"",
+                    ""name"": ""LockOn"",
                     ""type"": ""Button"",
-                    ""id"": ""a6d077a3-cee1-49a3-b7ae-02720742559d"",
+                    ""id"": ""f9c2f6c7-4c0a-42c2-818e-fbd0c80d8027"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""LockOn"",
+                    ""name"": ""Guard"",
                     ""type"": ""Button"",
-                    ""id"": ""f9c2f6c7-4c0a-42c2-818e-fbd0c80d8027"",
+                    ""id"": ""804cd32f-7ee7-4497-87cb-ec92585da445"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -300,45 +300,12 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""cafcb93e-84d8-4464-888d-f878ab7fb753"",
-                    ""path"": ""<XInputController>/buttonSouth"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Jump"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""b3fbf565-ae1f-44b5-bdc8-99a64fe1fa02"",
                     ""path"": ""<Keyboard>/space"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Jump"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""819e7342-1a9a-47ac-bdbb-b97bfbb50524"",
-                    ""path"": ""<Keyboard>/leftShift"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Sprint"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""967ef906-0323-4683-9a8e-baa59b412fec"",
-                    ""path"": ""<Gamepad>/leftTrigger"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Sprint"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -363,6 +330,28 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                     ""action"": ""LockOn"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9387af22-8c6a-4089-8bfa-0906f2b7b73d"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Guard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""53918d3a-5419-4847-936b-acb99ea4c36b"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Guard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -378,8 +367,8 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
         // Player Actions
         m_PlayerActions = asset.FindActionMap("Player Actions", throwIfNotFound: true);
         m_PlayerActions_Jump = m_PlayerActions.FindAction("Jump", throwIfNotFound: true);
-        m_PlayerActions_Sprint = m_PlayerActions.FindAction("Sprint", throwIfNotFound: true);
         m_PlayerActions_LockOn = m_PlayerActions.FindAction("LockOn", throwIfNotFound: true);
+        m_PlayerActions_Guard = m_PlayerActions.FindAction("Guard", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -497,15 +486,15 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
     private readonly InputActionMap m_PlayerActions;
     private IPlayerActionsActions m_PlayerActionsActionsCallbackInterface;
     private readonly InputAction m_PlayerActions_Jump;
-    private readonly InputAction m_PlayerActions_Sprint;
     private readonly InputAction m_PlayerActions_LockOn;
+    private readonly InputAction m_PlayerActions_Guard;
     public struct PlayerActionsActions
     {
         private @PlayerControl m_Wrapper;
         public PlayerActionsActions(@PlayerControl wrapper) { m_Wrapper = wrapper; }
         public InputAction @Jump => m_Wrapper.m_PlayerActions_Jump;
-        public InputAction @Sprint => m_Wrapper.m_PlayerActions_Sprint;
         public InputAction @LockOn => m_Wrapper.m_PlayerActions_LockOn;
+        public InputAction @Guard => m_Wrapper.m_PlayerActions_Guard;
         public InputActionMap Get() { return m_Wrapper.m_PlayerActions; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -518,12 +507,12 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                 @Jump.started -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnJump;
                 @Jump.performed -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnJump;
                 @Jump.canceled -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnJump;
-                @Sprint.started -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnSprint;
-                @Sprint.performed -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnSprint;
-                @Sprint.canceled -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnSprint;
                 @LockOn.started -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnLockOn;
                 @LockOn.performed -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnLockOn;
                 @LockOn.canceled -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnLockOn;
+                @Guard.started -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnGuard;
+                @Guard.performed -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnGuard;
+                @Guard.canceled -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnGuard;
             }
             m_Wrapper.m_PlayerActionsActionsCallbackInterface = instance;
             if (instance != null)
@@ -531,12 +520,12 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                 @Jump.started += instance.OnJump;
                 @Jump.performed += instance.OnJump;
                 @Jump.canceled += instance.OnJump;
-                @Sprint.started += instance.OnSprint;
-                @Sprint.performed += instance.OnSprint;
-                @Sprint.canceled += instance.OnSprint;
                 @LockOn.started += instance.OnLockOn;
                 @LockOn.performed += instance.OnLockOn;
                 @LockOn.canceled += instance.OnLockOn;
+                @Guard.started += instance.OnGuard;
+                @Guard.performed += instance.OnGuard;
+                @Guard.canceled += instance.OnGuard;
             }
         }
     }
@@ -551,7 +540,7 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
     public interface IPlayerActionsActions
     {
         void OnJump(InputAction.CallbackContext context);
-        void OnSprint(InputAction.CallbackContext context);
         void OnLockOn(InputAction.CallbackContext context);
+        void OnGuard(InputAction.CallbackContext context);
     }
 }

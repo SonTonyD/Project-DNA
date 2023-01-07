@@ -24,13 +24,16 @@ namespace DNA
         public static CameraHandler singleton;
 
         [SerializeField]
-        private float _horizontalSensitivity = 0.01f;
+        private float _horizontalSensitivity = 1.0f;
+        [SerializeField]
+        private float _verticalSensitivity = 1.0f;
+
+        private const float _SensitivityMultiplier = 100f;
+
         [SerializeField]
         private float _followSpeed = 0.1f;
         [SerializeField]
         private float _switchTargetSpeed = 0.1f;
-        [SerializeField]
-        private float _verticalSensitivity = 0.01f;
 
         private float _targetPosition;
         private float _defaultPosition;
@@ -42,11 +45,11 @@ namespace DNA
         private float _maximumPivot = 70.0f;
 
         [SerializeField]
-        private float _cameraSphereRadius = 0.3f;
+        private float _cameraSphereRadius = 0.2f;
         [SerializeField]
         private float _cameraCollisionOffset = 0.2f;
         [SerializeField]
-        private float _minimumCameraOffset = 0.5f;
+        private float _minimumCameraOffset = 0.2f;
         [SerializeField]
         private float _maximumLockOnDistance = 30;
         [SerializeField]
@@ -62,6 +65,7 @@ namespace DNA
         
         [SerializeField]
         private float _cameraPivotYOffset;
+        private bool _isLockRotationEnded;
         private const float _CameraPivotYOffsetConstant = 0.15f;
 
         public Transform CurrentLockOnTarget { get => _currentLockOnTarget; set => _currentLockOnTarget = value; }
@@ -95,17 +99,17 @@ namespace DNA
 
         public void FollowTarget(float delta)
         {
-            Vector3 targetPosition = Vector3.SmoothDamp(_myTransform.position, _targetTransform.position, ref _cameraFollowVelocity, delta / _followSpeed);
+            Vector3 targetPosition = Vector3.SmoothDamp(_myTransform.position, _targetTransform.position, ref _cameraFollowVelocity, _followSpeed);
             _myTransform.position = targetPosition;
             HandleCameraCollisions(delta);
         }
 
         public void HandleCameraRotation(float delta, float mouseXInput, float mouseYInput)
         {
-            if (_inputHandler.LockOnFlag == false && _currentLockOnTarget == null)
+            if (!_inputHandler.LockOnFlag && _currentLockOnTarget == null)
             {
-                _lookAngle += (mouseXInput * _horizontalSensitivity) / delta;
-                _pivotAngle += (mouseYInput * _verticalSensitivity) / delta;
+                _lookAngle += (mouseXInput * _horizontalSensitivity * _SensitivityMultiplier) * delta;
+                _pivotAngle += (mouseYInput * _verticalSensitivity * _SensitivityMultiplier) * delta;
                 _pivotAngle = Mathf.Clamp(_pivotAngle, _minimumPivot, _maximumPivot);
 
                 Vector3 rotation = Vector3.zero;
@@ -121,20 +125,30 @@ namespace DNA
             } 
             else
             {
-                Vector3 dir = _currentLockOnTarget.position - transform.position;
-                dir.Normalize();
-                dir.y = 0;
+                Vector3 direction = _currentLockOnTarget.position - transform.position;
+                direction.Normalize();
+                direction.y = 0;
 
-                Quaternion targetRotation = Quaternion.LookRotation(dir);
+                Quaternion targetRotation = Quaternion.LookRotation(direction);
 
-                //transform.rotation = targetRotation;
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, delta / _switchTargetSpeed);
-                
+                if (!_isLockRotationEnded && transform.rotation == targetRotation)
+                {
+                    _isLockRotationEnded = true;
+                }
 
-                dir = _currentLockOnTarget.position - _cameraPivotTransform.position;
-                dir.Normalize();
+                if (_isLockRotationEnded)
+                {
+                    transform.rotation = targetRotation;
+                }
+                else
+                {
+                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _switchTargetSpeed);
+                }
 
-                targetRotation = Quaternion.LookRotation(dir);
+                direction = _currentLockOnTarget.position - _cameraPivotTransform.position;
+                direction.Normalize();
+
+                targetRotation = Quaternion.LookRotation(direction);
                 Vector3 eulerAngle = targetRotation.eulerAngles;
                 eulerAngle.y = 0;
                 _cameraPivotTransform.localEulerAngles = eulerAngle;
@@ -159,7 +173,7 @@ namespace DNA
                 _targetPosition = -_minimumCameraOffset;
             }
 
-            _cameraTransformPosition.z = Mathf.Lerp(_cameraTransform.localPosition.z, _targetPosition, delta / 0.2f);
+            _cameraTransformPosition.z = Mathf.Lerp(_cameraTransform.localPosition.z, _targetPosition, 0.2f);
             _cameraTransform.localPosition = _cameraTransformPosition;
         }
 
@@ -244,6 +258,8 @@ namespace DNA
         {
             if (_inputHandler.LockOnFlag)
             {
+                _isLockRotationEnded = false;
+                UpdateAvailableTargets(delta);
                 if (_inputHandler.LockOnRightFlag)
                 {
                     _rightLockTarget = _rightCandidate;
@@ -258,9 +274,10 @@ namespace DNA
 
         public void ClearLockOnTargets()
         {
-            _availableTargets.Clear();
             _currentLockOnTarget = null;
             _nearestLockOnTarget = null;
+            _isLockRotationEnded = false;
+            _availableTargets.Clear();
         }
     }
 }

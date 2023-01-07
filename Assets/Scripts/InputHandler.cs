@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace DNA
@@ -23,16 +21,21 @@ namespace DNA
         private bool _jumpFlag;
 
         [SerializeField]
-        private bool _leftTrigger_Input;
+        private bool _isTimerStarted;
+        [SerializeField]
+        private float _walkStartTime;
         [SerializeField]
         private bool _sprintFlag;
 
         [SerializeField]
+        private bool _dodgeFlag;
+
+        [SerializeField]
         private bool _lockOnInput;
         [SerializeField]
-        private bool _right_Stick_Right_Input;
+        private bool _rightStick_Right_Input;
         [SerializeField]
-        private bool _right_Stick_Left_Input;
+        private bool _rightStick_Left_Input;
         [SerializeField]
         private bool _lockOnFlag;
         [SerializeField]
@@ -43,6 +46,9 @@ namespace DNA
         private PlayerControl _inputActions;
         [SerializeField]
         private CameraHandler _cameraHandler;
+
+        [SerializeField]
+        private bool _isMoveDisabled;
 
         private Vector2 _movementInput;
         private Vector2 _cameraInput;
@@ -57,6 +63,8 @@ namespace DNA
         public bool LockOnFlag { get => _lockOnFlag; set => _lockOnFlag = value; }
         public bool LockOnRightFlag { get => _lockOnRightFlag; set => _lockOnRightFlag = value; }
         public bool LockOnLeftFlag { get => _lockOnLeftFlag; set => _lockOnLeftFlag = value; }
+        public bool DodgeFlag { get => _dodgeFlag; set => _dodgeFlag = value; }
+        public Vector2 MovementInput { get => _movementInput; set => _movementInput = value; }
 
         private void Start()
         {
@@ -68,11 +76,9 @@ namespace DNA
             if (_inputActions == null)
             {
                 _inputActions = new PlayerControl();
-                _inputActions.PlayerMovement.Movement.performed += inputActions => _movementInput = inputActions.ReadValue<Vector2>();
+                _inputActions.PlayerMovement.Movement.performed += i => _movementInput = i.ReadValue<Vector2>();
                 _inputActions.PlayerMovement.Camera.performed += i => _cameraInput = i.ReadValue<Vector2>();
                 _inputActions.PlayerActions.LockOn.performed += i => _lockOnInput = true;
-                _inputActions.PlayerMovement.LockOnTargetRight.performed += i => _right_Stick_Right_Input = true;
-                _inputActions.PlayerMovement.LockOnTargetLeft.performed += i => _right_Stick_Left_Input = true;
             }
 
             _inputActions.Enable();
@@ -89,13 +95,23 @@ namespace DNA
             HandleJumpInput(delta);
             HandleSprintInput(delta);
             HandleLockOnInput(delta);
+            HandleGuardAndDodgeInput(delta);
         }
 
         private void MoveInput(float delta)
         {
-            _horizontal = _movementInput.x;
-            _vertical = _movementInput.y;
-            _moveAmount = Mathf.Clamp01(Mathf.Abs(_horizontal) + Mathf.Abs(_vertical));
+            if (!_isMoveDisabled)
+            {
+                _horizontal = _movementInput.x;
+                _vertical = _movementInput.y;
+                _moveAmount = Mathf.Clamp01(Mathf.Abs(_horizontal) + Mathf.Abs(_vertical));
+            }
+            else
+            {
+                _horizontal = 0;
+                _vertical = 0;
+                _moveAmount = 0;
+            }
             _mouseX = _cameraInput.x;
             _mouseY = _cameraInput.y;
         }
@@ -116,8 +132,17 @@ namespace DNA
 
         private void HandleSprintInput(float delta)
         {
-            _leftTrigger_Input = _inputActions.PlayerActions.Sprint.IsPressed();
-            if (_leftTrigger_Input)
+            if (_moveAmount == 1 && !_isTimerStarted)
+            {
+                _walkStartTime = Time.time;
+                _isTimerStarted = true;
+            }
+            else if (_moveAmount < 1 && _isTimerStarted)
+            {
+                _isTimerStarted = false;
+            }
+
+            if (_isTimerStarted && Time.time - _walkStartTime >= 5f)
             {
                 _sprintFlag = true;
             }
@@ -129,10 +154,10 @@ namespace DNA
 
         private void HandleLockOnInput(float delta)
         {
-            if (_lockOnInput && _lockOnFlag == false)
+            if (_lockOnInput && !_lockOnFlag)
             {
                 _lockOnInput = false;
-                _cameraHandler.HandleLockOn(delta);
+                _cameraHandler.UpdateAvailableTargets(delta);
 
                 if (_cameraHandler.NearestLockOnTarget != null)
                 {
@@ -147,10 +172,13 @@ namespace DNA
                 _cameraHandler.ClearLockOnTargets();
             }
 
-            if (_lockOnFlag && _right_Stick_Left_Input)
+            _rightStick_Left_Input = _inputActions.PlayerMovement.LockOnTargetLeft.triggered;
+            _rightStick_Right_Input = _inputActions.PlayerMovement.LockOnTargetRight.triggered;
+
+            if (_lockOnFlag && _rightStick_Left_Input)
             {
                 _lockOnLeftFlag = true;
-                _right_Stick_Left_Input = false;
+                _rightStick_Left_Input = false;
                 _cameraHandler.HandleLockOn(delta);
 
                 if (_cameraHandler.LeftLockTarget != null)
@@ -160,10 +188,10 @@ namespace DNA
                 _lockOnLeftFlag = false;
             }
 
-            if (_lockOnFlag && _right_Stick_Right_Input)
+            if (_lockOnFlag && _rightStick_Right_Input)
             {
                 _lockOnRightFlag = true;
-                _right_Stick_Right_Input = false;
+                _rightStick_Right_Input = false;
                 _cameraHandler.HandleLockOn(delta);
 
                 if (_cameraHandler.RightLockTarget != null)
@@ -171,6 +199,27 @@ namespace DNA
                     _cameraHandler.CurrentLockOnTarget = _cameraHandler.RightLockTarget;
                 }
                 _lockOnRightFlag = false;
+            }
+        }
+
+        private void HandleGuardAndDodgeInput(float delta)
+        {
+            if (_inputActions.PlayerActions.Guard.IsPressed())
+            {
+                _isMoveDisabled = true;
+                if (Mathf.Abs(_movementInput.x) + Mathf.Abs(_movementInput.y) > 0.0f)
+                {
+                    _dodgeFlag = true;
+                }
+                else if (Mathf.Abs(_movementInput.x) + Mathf.Abs(_movementInput.y) == 0.0f)
+                {
+                    _dodgeFlag = false;
+                }
+            }
+            else
+            {
+                _isMoveDisabled = false;
+                _dodgeFlag = false;
             }
         }
     }
