@@ -64,6 +64,7 @@ namespace DNA
         public bool LockOnRightFlag { get => _lockOnRightFlag; set => _lockOnRightFlag = value; }
         public bool LockOnLeftFlag { get => _lockOnLeftFlag; set => _lockOnLeftFlag = value; }
         public bool DodgeFlag { get => _dodgeFlag; set => _dodgeFlag = value; }
+        public Vector2 MovementInput { get => _movementInput; set => _movementInput = value; }
 
         private void Start()
         {

@@ -18,9 +18,13 @@ namespace DNA
         [SerializeField]
         private bool _isUsingRootMotion;
 
+        private const string _JumpString = "Jump";
+        private const string _GroundedString = "Grounded";
+        private const string _DodgeString = "Dodge";
+
         private int _jumpID;
         private int _groundedID;
-        private int _freeFallID;
+        private int _dodgeID;
 
         public bool IsRotationEnabled { get => _isRotationEnabled; set => _isRotationEnabled = value; }
         public Animator Anim { get => _anim; set => _anim = value; }
@@ -31,21 +35,31 @@ namespace DNA
             _isRotationEnabled = true;
             _anim = GetComponent<Animator>();
             _playerMovement = GetComponent<PlayerMovement>();
+
             _vertical = Animator.StringToHash("Vertical");
             _horizontal = Animator.StringToHash("Horizontal");
             _jumpID = Animator.StringToHash("Jump");
             _groundedID = Animator.StringToHash("Grounded");
-            _freeFallID = Animator.StringToHash("FreeFall");
+            _dodgeID = Animator.StringToHash("Dodge");
         }
 
-        public void SetJumpAnimation(bool isJumping)
+        public void PlayAnimation(string animationName, bool activation, bool isUsingRootMotion = false)
         {
-            _anim.SetBool(_jumpID, isJumping);
-        }
-
-        public void SetGroundedAnimation(bool isGrounded)
-        {
-            _anim.SetBool(_groundedID, isGrounded);
+            switch (animationName)
+            {
+                case _JumpString:
+                    _anim.SetBool(_jumpID, activation);
+                    break;
+                case _GroundedString:
+                    _anim.SetBool(_groundedID, activation);
+                    break;
+                case _DodgeString:
+                    _anim.SetBool(_dodgeID, activation);
+                    break;
+                default:
+                    Debug.Log("No matching animation");
+                    break;
+            }
         }
 
         public void UpdateAnimatorValues(float verticalMovement, float horizontalMovement)
@@ -102,14 +116,6 @@ namespace DNA
 
             _anim.SetFloat(_vertical, v, 0.1f, Time.deltaTime);
             _anim.SetFloat(_horizontal, h, 0.1f, Time.deltaTime);
-        }
-
-        public void PlayTargetAnimation(string targetAnim, bool isInteracting, bool isUsingRootMotion = false)
-        {
-            _anim.applyRootMotion = isInteracting;
-            _anim.SetBool("isInteracting", isInteracting);
-            _anim.SetBool("isUsingRootMotion", isUsingRootMotion);
-            _anim.CrossFade(targetAnim, 0.2f);
         }
 
         public void CanRotate()

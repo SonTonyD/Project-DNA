@@ -33,10 +33,14 @@ namespace DNA
         [SerializeField]
         private float _verticalVelocity;
         [SerializeField]
+        private Vector3 _horizontalVelocity = Vector3.zero;
+        [SerializeField]
         private float _terminalVelocity = 50.0f;
 
         [SerializeField]
         private bool _isDodging = false;
+        [SerializeField]
+        private const float _DodgeAnimationDuration = 1.0f;
 
         [Header("Stats")]
         [SerializeField]
@@ -72,10 +76,7 @@ namespace DNA
 
         private void HandleRotation(float delta)
         {
-            Vector3 targetDir = Vector3.zero;
-            float moveOverride = _inputHandler.MoveAmount;
-
-            targetDir = _cameraObject.forward * _inputHandler.Vertical;
+            Vector3 targetDir = _cameraObject.forward * _inputHandler.Vertical;
             targetDir += _cameraObject.right * _inputHandler.Horizontal;
 
             targetDir.Normalize();
@@ -86,10 +87,8 @@ namespace DNA
                 targetDir = _myTransform.forward;
             }
 
-            float rs = _rotationSpeed;
-
-            Quaternion tr = Quaternion.LookRotation(targetDir);
-            Quaternion targetRotation = Quaternion.Slerp(_myTransform.rotation, tr, rs * delta);
+            Quaternion lookRotation = Quaternion.LookRotation(targetDir);
+            Quaternion targetRotation = Quaternion.Slerp(_myTransform.rotation, lookRotation, _rotationSpeed * delta);
 
             _myTransform.rotation = targetRotation;
         }
@@ -124,11 +123,18 @@ namespace DNA
             _moveDirection *= speed;
 
             Vector3 projectedVelocity = Vector3.ProjectOnPlane(_moveDirection, _normalVector);
-            _controller.Move(_moveDirection.normalized * (speed * _speedModulation * delta) + new Vector3(0.0f, _verticalVelocity, 0.0f) * delta);
+            if (_horizontalVelocity != Vector3.zero)
+            {
+                _controller.Move(new Vector3(_horizontalVelocity.x, _verticalVelocity, _horizontalVelocity.z) * delta);
+            }
+            else
+            {
+                _controller.Move(_moveDirection.normalized * (speed * _speedModulation * delta) + new Vector3(0.0f, _verticalVelocity, 0.0f) * delta);
+            }
 
             _animatorHandler.UpdateAnimatorValues(_inputHandler.MoveAmount, 0);
 
-            if (_animatorHandler.IsRotationEnabled)
+            if (_animatorHandler.IsRotationEnabled && _horizontalVelocity == Vector3.zero)
             {
                 HandleRotation(delta);
             }
@@ -136,20 +142,19 @@ namespace DNA
 
         public void HandleJumping(float delta)
         {
-
-            _animatorHandler.SetGroundedAnimation(_isGrounded);
-            _animatorHandler.SetJumpAnimation(false);
+            _animatorHandler.PlayAnimation("Grounded", _isGrounded);
+            _animatorHandler.PlayAnimation("Jump", false);
 
             if (_inputHandler.JumpFlag && _isGrounded)
             {
                 _didSecondJump = false;
-                _animatorHandler.SetJumpAnimation(true);
+                _animatorHandler.PlayAnimation("Jump", true);
                 _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
             }
             else if (_inputHandler.JumpFlag && !_isGrounded && !_didSecondJump)
             {
                 _didSecondJump = true;
-                _animatorHandler.SetJumpAnimation(true);
+                _animatorHandler.PlayAnimation("Jump", true);
                 _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
             }
 
@@ -170,34 +175,42 @@ namespace DNA
 
         public void HandleDodge(float delta)
         {
-            if (_inputHandler.DodgeFlag && !_isDodging)
+            if (_inputHandler.DodgeFlag)
             {
                 // Invulnerability frames
                 // Set animation having exit time and using its root motion to move the player
 
-                _moveDirection = _cameraObject.forward * _inputHandler.Vertical;
-                _moveDirection += _cameraObject.right * _inputHandler.Horizontal;
+                _moveDirection = _cameraObject.forward * _inputHandler.MovementInput.y;
+                _moveDirection += _cameraObject.right * _inputHandler.MovementInput.x;
+                _moveDirection.y = 0;
 
-                // Do animation
-                //_moveDirection.y = 0;
-                //Quaternion rollRotation = Quaternion.LookRotation(_moveDirection);
-                //_myTransform.rotation = rollRotation;
-                _isDodging = true;
-                Debug.Log("Dodging");
-                // Wait for dodge animation end to reset _isDodging
-                Invoke(nameof(ResetDodge), 2); // temporary
+
+                if (_moveDirection != Vector3.zero && !_isDodging)
+                {
+                    Quaternion lookRotation = Quaternion.LookRotation(_moveDirection);
+                    _myTransform.rotation = lookRotation;
+
+                    _isDodging = true;
+                    _animatorHandler.PlayAnimation("Dodge", true);
+                    _horizontalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity) * _moveDirection.normalized;
+
+                    // Wait for dodge animation end to reset dodging variables
+                    Invoke(nameof(ResetDodge), _DodgeAnimationDuration);
+                }
             }
         }
 
         private void ResetDodge()
         {
+            _animatorHandler.PlayAnimation("Dodge", false);
+            _horizontalVelocity = Vector3.zero;
             _isDodging = false;
         }
 
         public void GroundedCheck()
         {
             // set sphere position, with offset
-            Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - _groundedOffset,
+            Vector3 spherePosition = new(transform.position.x, transform.position.y - _groundedOffset,
                 transform.position.z);
             _isGrounded = Physics.CheckSphere(spherePosition, _controller.radius, _groundLayers,
                 QueryTriggerInteraction.Ignore);

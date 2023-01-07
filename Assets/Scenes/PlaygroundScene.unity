@@ -676,6 +676,7 @@ MonoBehaviour:
   _groundedOffset: -0.08
   _didSecondJump: 0
   _verticalVelocity: 0
+  _horizontalVelocity: {x: 0, y: 0, z: 0}
   _terminalVelocity: 50
   _isDodging: 0
   _movementSpeed: 8
@@ -895,9 +896,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   _horizontalSensitivity: 1
+  _verticalSensitivity: 1
   _followSpeed: 0.1
   _switchTargetSpeed: 0.1
-  _verticalSensitivity: 1
   _minimumPivot: -30
   _maximumPivot: 70
   _cameraSphereRadius: 0.2
@@ -1592,6 +1593,10 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 40db3173a05ae3242b1c182a09b0a183, type: 2}
+    - target: {fileID: 5866666021909216657, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
 --- !u!1 &1189020871
