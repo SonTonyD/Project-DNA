@@ -47,6 +47,7 @@ namespace DNA
             _playerMovement.HandleJumping(delta);
             _playerMovement.HandleDodge(delta);
             _playerMovement.HandleMovement(delta);
+            _playerMovement.HandleAttack(delta);
         }
 
         private void InitializeCharacterController()

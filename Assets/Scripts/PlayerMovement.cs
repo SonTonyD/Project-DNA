@@ -20,6 +20,9 @@ namespace DNA
         private GameObject _normalCamera;
         [SerializeField]
         private CharacterController _controller;
+        [SerializeField]
+        private Hitbox _hitbox;
+
 
         [Header("Jump Stats")]
         [SerializeField]
@@ -66,6 +69,7 @@ namespace DNA
             _controller = GetComponent<CharacterController>();
             _inputHandler = GetComponent<InputHandler>();
             _animatorHandler = GetComponentInChildren<AnimatorHandler>();
+            _hitbox = GetComponentInChildren<Hitbox>();
             _cameraObject = Camera.main.transform;
             _myTransform = transform;
             _animatorHandler.Initialize();
@@ -215,6 +219,38 @@ namespace DNA
             _isGrounded = Physics.CheckSphere(spherePosition, _controller.radius, _groundLayers,
                 QueryTriggerInteraction.Ignore);
         }
+
+        public void HandleAttack(float delta)
+        {
+            if (_inputHandler.AttackFlag)
+            {
+                float startupFrame = 31/60f;
+                float activeFrame = 31/60f;
+                float recoveryFrame = 48/60f;
+
+                DisableMove(startupFrame + activeFrame + recoveryFrame);
+                _hitbox.LaunchAttack(startupFrame, activeFrame, recoveryFrame);
+            }
+        }
+
+        #region Enable/Disable Movement
+
+        private void DisableMove()
+        {
+            _inputHandler.IsMoveDisabled = true;
+        }
+
+        private void DisableMove(float time)
+        {
+            _inputHandler.IsMoveDisabled = true;
+            Invoke(nameof(EnableMove), time);
+        }
+
+        private void EnableMove()
+        {
+            _inputHandler.IsMoveDisabled = false;
+        }
+        #endregion
 
         #endregion
     }

@@ -19,6 +19,7 @@ namespace DNA
         private bool _a_Input;
         [SerializeField]
         private bool _jumpFlag;
+        private bool _attackFlag;
 
         [SerializeField]
         private bool _isTimerStarted;
@@ -64,7 +65,10 @@ namespace DNA
         public bool LockOnRightFlag { get => _lockOnRightFlag; set => _lockOnRightFlag = value; }
         public bool LockOnLeftFlag { get => _lockOnLeftFlag; set => _lockOnLeftFlag = value; }
         public bool DodgeFlag { get => _dodgeFlag; set => _dodgeFlag = value; }
+
         public Vector2 MovementInput { get => _movementInput; set => _movementInput = value; }
+        public bool AttackFlag { get => _attackFlag; set => _attackFlag = value; }
+        public bool IsMoveDisabled { get => _isMoveDisabled; set => _isMoveDisabled = value; }
 
         private void Start()
         {
@@ -79,6 +83,7 @@ namespace DNA
                 _inputActions.PlayerMovement.Movement.performed += i => _movementInput = i.ReadValue<Vector2>();
                 _inputActions.PlayerMovement.Camera.performed += i => _cameraInput = i.ReadValue<Vector2>();
                 _inputActions.PlayerActions.LockOn.performed += i => _lockOnInput = true;
+
             }
 
             _inputActions.Enable();
@@ -96,6 +101,7 @@ namespace DNA
             HandleSprintInput(delta);
             HandleLockOnInput(delta);
             HandleGuardAndDodgeInput(delta);
+            HandleAttackInput(delta);
         }
 
         private void MoveInput(float delta)
@@ -215,11 +221,24 @@ namespace DNA
                 {
                     _dodgeFlag = false;
                 }
+                _isMoveDisabled = false;
+                _isTimerStarted = false; //Disable sprint after a dodge
             }
             else
             {
-                _isMoveDisabled = false;
                 _dodgeFlag = false;
+            }
+        }
+
+        private void HandleAttackInput(float delta)
+        {
+            if (_inputActions.PlayerActions.Attack.triggered)
+            {
+                AttackFlag = true;
+            }
+            else
+            {
+                AttackFlag = false;
             }
         }
     }
