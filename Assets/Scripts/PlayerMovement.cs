@@ -224,12 +224,10 @@ namespace DNA
         {
             if (_inputHandler.AttackFlag)
             {
-                float startupFrame = 31/60f;
-                float activeFrame = 31/60f;
-                float recoveryFrame = 48/60f;
+                Attack attack = Attack.CreateInstance(31f, 31f, 48f, _hitbox);
 
-                DisableMove(startupFrame + activeFrame + recoveryFrame);
-                _hitbox.LaunchAttack(startupFrame, activeFrame, recoveryFrame);
+                DisableMove(attack.TotalFrame);
+                attack.LaunchAttack();
             }
         }
 

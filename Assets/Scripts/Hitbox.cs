@@ -22,7 +22,7 @@ public class Hitbox : MonoBehaviour
         _isRecovering = false;
     }
 
-    public void LaunchAttack(float startupFrame, float activeFrame, float recoveryFrame)
+    public void Apply(float startupFrame, float activeFrame, float recoveryFrame)
     {
         if (_isRecovering == false && _isAttacking == false)
         {
