@@ -2,17 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Hurtbox : MonoBehaviour
+namespace DNA
 {
-    // Start is called before the first frame update
-    void Start()
+    public class Hurtbox : MonoBehaviour
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        private HurtboxManager _hurtboxManager;
+        public HurtboxManager HurtboxManager { get => _hurtboxManager; set => _hurtboxManager = value; }
     }
 }
+

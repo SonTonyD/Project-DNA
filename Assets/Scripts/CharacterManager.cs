@@ -8,7 +8,6 @@ namespace DNA
     {
         [SerializeField]
         private Transform _lockOnTransform;
-
         public Transform LockOnTransform { get => _lockOnTransform; set => _lockOnTransform = value; }
     }
 }
