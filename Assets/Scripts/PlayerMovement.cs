@@ -224,27 +224,20 @@ namespace DNA
         {
             if (_inputHandler.AttackFlag)
             {
-                Attack attack = Attack.CreateInstance(31f, 31f, 48f, _hitbox);
-
-                DisableMove(attack.TotalFrame);
+                List<int> activeFrames = new() {6};
+                Attack attack = Attack.CreateInstance(activeFrames, 32, _hitbox);
                 attack.LaunchAttack();
             }
         }
 
         #region Enable/Disable Movement
 
-        private void DisableMove()
+        public void DisableMove()
         {
             _inputHandler.IsMoveDisabled = true;
         }
 
-        private void DisableMove(float time)
-        {
-            _inputHandler.IsMoveDisabled = true;
-            Invoke(nameof(EnableMove), time);
-        }
-
-        private void EnableMove()
+        public void EnableMove()
         {
             _inputHandler.IsMoveDisabled = false;
         }

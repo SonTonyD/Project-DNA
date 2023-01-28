@@ -8,32 +8,31 @@ namespace DNA
     {
         private Hitbox _hitbox;
 
-        private float _startupFrame;
-        private float _activeFrame;
-        private float _recoveryFrame;
-        private float _totalFrame;
+        private int _lastRecoveryFrame;
+        private List<int> _activeFrames;
 
-        public float TotalFrame { get => _totalFrame; set => _totalFrame = value; }
+        public int FinalFrame { get => _lastRecoveryFrame; set => _lastRecoveryFrame = value; }
 
-        public void Init(float startupFrame, float activeFrame, float recoveryFrame, Hitbox hitbox)
+        public void Init(List<int> activeFrames, int lastRecoveryFrame, Hitbox hitbox)
         {
-            this._startupFrame = startupFrame / 60f;
-            this._activeFrame = activeFrame / 60f;
-            this._recoveryFrame = recoveryFrame / 60f;
-
-            this._totalFrame = this._startupFrame + this._activeFrame + this._recoveryFrame;
+            this._activeFrames = activeFrames;
+            this._lastRecoveryFrame = lastRecoveryFrame;
             this._hitbox = hitbox;
         }
-        public static Attack CreateInstance(float startupFrame, float activeFrame, float recoveryFrame, Hitbox hitbox)
+        public static Attack CreateInstance(List<int> activeFrames, int lastRecoveryFrame, Hitbox hitbox)
         {
             var attack = ScriptableObject.CreateInstance<Attack>();
-            attack.Init(startupFrame, activeFrame, recoveryFrame, hitbox);
+            attack.Init(activeFrames, lastRecoveryFrame, hitbox);
             return attack;
         }
 
         public void LaunchAttack()
         {
-            _hitbox.Apply(_startupFrame, _activeFrame, _recoveryFrame);
+            if (_hitbox.IsAttacking == false)
+            {
+                _hitbox.IsAttacking = true;
+                _hitbox.SetFrameParameters(_activeFrames, _lastRecoveryFrame);
+            }
         }
     }
 }

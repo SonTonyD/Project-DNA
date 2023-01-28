@@ -8,23 +8,57 @@ namespace DNA
     {
         private BoxCollider _boxCollider;
         private MeshRenderer _meshRenderer;
+        private InputHandler _inputHandler;
 
-        private bool _isRecovering;
         private bool _isAttacking;
         private LayerMask _enemyLayer;
+        private bool _hasInputHandler;
+
+        private int _lastRecoveryFrame;
+        private List<int> _activeFrames;
+        private Hitbox[] _hitbox;
+
+        private int _counter;
+
+        public bool IsAttacking { get => _isAttacking; set => _isAttacking = value; }
 
         private void Awake()
         {
             _boxCollider = GetComponent<BoxCollider>();
-            _boxCollider.isTrigger = true;
             _meshRenderer = GetComponent<MeshRenderer>();
+
+            if (GetComponentInParent<InputHandler>())
+            {
+                _inputHandler = GetComponentInParent<InputHandler>();
+                _hasInputHandler = true;
+            }
+            else
+            {
+                _hasInputHandler = false;
+            }
+            _boxCollider.isTrigger = true;
             _enemyLayer.value = LayerMask.GetMask("Enemy", "Controller");
         }
 
         private void Start()
         {
-            SetReset();
-            _isRecovering = false;
+            DisableHitbox();
+            _isAttacking = false;
+            _counter = 1;
+            _lastRecoveryFrame = -1;
+    }
+
+        private void Update()
+        {
+            if (_isAttacking)
+            {
+                if (_hasInputHandler)
+                {
+                    _inputHandler.IsMoveDisabled = true;
+                }
+                Apply();
+            }
+            
         }
 
         void OnTriggerEnter(Collider other)
@@ -39,38 +73,51 @@ namespace DNA
             }
         }
 
-        public void Apply(float startupFrame, float activeFrame, float recoveryFrame)
+        public void Apply()
         {
-            if (_isRecovering == false && _isAttacking == false)
+            if (_activeFrames.Contains(_counter) && !_boxCollider.enabled && !_meshRenderer.enabled)
             {
-                _isAttacking = true;
-                Invoke(nameof(SetActive), startupFrame);
-                Invoke(nameof(SetReset), activeFrame + startupFrame);
-                Invoke(nameof(StartRecovering), activeFrame + startupFrame);
-                Invoke(nameof(EndRecovering), activeFrame + startupFrame + recoveryFrame);
+                //Debug.Log(_counter);
+                EnableHitbox();
             }
+            else
+            {
+                DisableHitbox();
+            }
+            
+            if (_counter > _lastRecoveryFrame)
+            {
+                EndAttack();
+            }
+            _counter += 1;
         }
 
-        private void SetActive()
+        private void EnableHitbox()
         {
             _boxCollider.enabled = true;
             _meshRenderer.enabled = true;
         }
 
-        private void SetReset()
+        private void DisableHitbox()
         {
             _boxCollider.enabled = false;
             _meshRenderer.enabled = false;
         }
 
-        private void StartRecovering()
+        private void EndAttack()
         {
-            _isRecovering = true;
-        }
-        private void EndRecovering()
-        {
-            _isRecovering = false;
+            if (_hasInputHandler)
+            {
+                _inputHandler.IsMoveDisabled = false;
+            }
             _isAttacking = false;
+            _counter = 0;
+        }
+
+        public void SetFrameParameters(List<int> activeFrames, int lastRecoveryFrame)
+        {
+            this._activeFrames = activeFrames;
+            this._lastRecoveryFrame = lastRecoveryFrame;
         }
 
 

@@ -20,7 +20,9 @@ namespace DNA
         {
             if (_hitbox)
             {
-                _hitbox.Apply(0.2f, 0.8f, 0.8f); //Make the enemy to attack (test)
+                List<int> activeFrames = new() { 3 };
+                Attack attack = Attack.CreateInstance(activeFrames, 32, _hitbox);
+                attack.LaunchAttack();
             }
         }
     }
