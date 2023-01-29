@@ -24,7 +24,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "LockOnTargetLeft",
+                    "name": "LockLeft",
                     "type": "Button",
                     "id": "02f68da5-fc46-4c2e-9127-a5b4552d2ea2",
                     "expectedControlType": "Button",
@@ -33,7 +33,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "LockOnTargetRight",
+                    "name": "LockRight",
                     "type": "Button",
                     "id": "c76275e3-b6d2-458a-92d9-de13b6fd0600",
                     "expectedControlType": "Button",
@@ -193,7 +193,7 @@
                     "interactions": "Press(pressPoint=0.25)",
                     "processors": "AxisDeadzone",
                     "groups": "",
-                    "action": "LockOnTargetLeft",
+                    "action": "LockLeft",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -204,7 +204,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "LockOnTargetLeft",
+                    "action": "LockLeft",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -215,7 +215,7 @@
                     "interactions": "Press(pressPoint=0.25)",
                     "processors": "AxisDeadzone",
                     "groups": "",
-                    "action": "LockOnTargetRight",
+                    "action": "LockRight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -226,7 +226,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "LockOnTargetRight",
+                    "action": "LockRight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -246,7 +246,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "LockOn",
+                    "name": "Lock",
                     "type": "Button",
                     "id": "f9c2f6c7-4c0a-42c2-818e-fbd0c80d8027",
                     "expectedControlType": "Button",
@@ -294,7 +294,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "LockOn",
+                    "action": "Lock",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -305,7 +305,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "LockOn",
+                    "action": "Lock",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

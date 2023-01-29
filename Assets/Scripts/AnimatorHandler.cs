@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -7,8 +5,9 @@ namespace DNA
 {
     public class AnimatorHandler : MonoBehaviour
     {
-        private Animator _anim;
+        private Animator _animator;
         private PlayerMovement _playerMovement;
+
         [SerializeField]
         private int _vertical;
         [SerializeField]
@@ -20,41 +19,49 @@ namespace DNA
 
         private const string _JumpString = "Jump";
         private const string _GroundedString = "Grounded";
-        private const string _DodgeString = "Dodge";
+        private const string _StepString = "Step";
 
-        private int _jumpID;
-        private int _groundedID;
-        private int _dodgeID;
+        private int _animatorJumpID;
+        private int _animatorGroundedID;
+        private int _animatorStepID;
 
+        public Animator Animator { get => _animator; set => _animator = value; }
         public bool IsRotationEnabled { get => _isRotationEnabled; set => _isRotationEnabled = value; }
-        public Animator Anim { get => _anim; set => _anim = value; }
+        public string JumpString => _JumpString;
+        public string StepString => _StepString;
+        public string GroundedString => _GroundedString;
 
 
         public void Initialize()
         {
             _isRotationEnabled = true;
-            _anim = GetComponent<Animator>();
+            _animator = GetComponent<Animator>();
             _playerMovement = GetComponent<PlayerMovement>();
 
             _vertical = Animator.StringToHash("Vertical");
             _horizontal = Animator.StringToHash("Horizontal");
-            _jumpID = Animator.StringToHash("Jump");
-            _groundedID = Animator.StringToHash("Grounded");
-            _dodgeID = Animator.StringToHash("Dodge");
+            _animatorJumpID = Animator.StringToHash("Jump");
+            _animatorGroundedID = Animator.StringToHash("Grounded");
+            _animatorStepID = Animator.StringToHash("Step");
         }
 
+        /// <summary>
+        /// Changes the animator boolean value corresponding to the given animation name string
+        /// </summary>
+        /// <param name="animationName">Name of the animation to execute or stop</param>
+        /// <param name="activation">Execute or stop the given animation</param>
         public void PlayAnimation(string animationName, bool activation, bool isUsingRootMotion = false)
         {
             switch (animationName)
             {
                 case _JumpString:
-                    _anim.SetBool(_jumpID, activation);
+                    _animator.SetBool(_animatorJumpID, activation);
                     break;
                 case _GroundedString:
-                    _anim.SetBool(_groundedID, activation);
+                    _animator.SetBool(_animatorGroundedID, activation);
                     break;
-                case _DodgeString:
-                    _anim.SetBool(_dodgeID, activation);
+                case _StepString:
+                    _animator.SetBool(_animatorStepID, activation);
                     break;
                 default:
                     Debug.Log("No matching animation");
@@ -62,7 +69,12 @@ namespace DNA
             }
         }
 
-        public void UpdateAnimatorValues(float verticalMovement, float horizontalMovement)
+        /// <summary>
+        /// Updates the animator movement values to make the character idle, walk or run
+        /// </summary>
+        /// <param name="verticalMovement">Value for up and down movements</param>
+        /// <param name="horizontalMovement">Value for forward, back, right, left movements</param>
+        public void UpdateAnimatorMovementValues(float verticalMovement, float horizontalMovement)
         {
             #region Vertical
             float v = 0;
@@ -114,16 +126,22 @@ namespace DNA
             }
             #endregion
 
-            _anim.SetFloat(_vertical, v, 0.1f, Time.deltaTime);
-            _anim.SetFloat(_horizontal, h, 0.1f, Time.deltaTime);
+            _animator.SetFloat(_vertical, v, 0.1f, Time.deltaTime);
+            _animator.SetFloat(_horizontal, h, 0.1f, Time.deltaTime);
         }
 
-        public void CanRotate()
+        /// <summary>
+        /// Enables character rotation
+        /// </summary>
+        public void EnableRotation()
         {
             _isRotationEnabled = true;
         }
 
-        public void StopRotate()
+        /// <summary>
+        /// Disables character rotation
+        /// </summary>
+        public void DisableRotation()
         {
             _isRotationEnabled = false;
         }
