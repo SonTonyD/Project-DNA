@@ -684,7 +684,9 @@ MonoBehaviour:
   _verticalVelocity: 0
   _terminalVelocity: 50
   _horizontalVelocity: {x: 0, y: 0, z: 0}
-  _isSteping: 0
+  _isStepping: 0
+  _stepPower: 5
+  _stepDuration: 0.25
 --- !u!114 &206747141
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -898,15 +900,15 @@ MonoBehaviour:
   _horizontalSensitivity: 1
   _verticalSensitivity: 1
   _followSpeed: 0.1
-  _switchTargetSpeed: 0.1
   _minimumPivot: -30
   _maximumPivot: 70
   _cameraSphereRadius: 0.2
   _cameraCollisionOffset: 0.2
   _minimumCameraOffset: 0.2
-  _maximumLockOnDistance: 30
-  _availableTargetRadius: 26
   _cameraPivotYOffset: 0
+  _switchLockTargetSpeed: 0.1
+  _maximumLockDistance: 30
+  _availableLockTargetRadius: 26
 --- !u!1 &487994119
 GameObject:
   m_ObjectHideFlags: 0
