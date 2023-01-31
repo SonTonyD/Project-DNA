@@ -20,8 +20,7 @@ namespace DNA
         private GameObject _normalCamera;
         [SerializeField]
         private CharacterController _controller;
-        [SerializeField]
-        private Hitbox _hitbox;
+
 
 
         [Header("Jump Stats")]
@@ -60,6 +59,7 @@ namespace DNA
         private float _speedModulation = 0f;
 
         private Vector3 _normalVector;
+        private PlayerAttacker _playerAttacker;
 
         public CharacterController Controller { get => _controller; set => _controller = value; }
 
@@ -69,7 +69,7 @@ namespace DNA
             _controller = GetComponent<CharacterController>();
             _inputHandler = GetComponent<InputHandler>();
             _animatorHandler = GetComponentInChildren<AnimatorHandler>();
-            _hitbox = GetComponentInChildren<Hitbox>();
+            _playerAttacker = GetComponent<PlayerAttacker>();
             _cameraObject = Camera.main.transform;
             _myTransform = transform;
             _animatorHandler.Initialize();
@@ -224,9 +224,7 @@ namespace DNA
         {
             if (_inputHandler.AttackFlag)
             {
-                List<int> activeFrames = new() {6};
-                Attack attack = Attack.CreateInstance(activeFrames, 32, _hitbox);
-                attack.LaunchAttack();
+                _playerAttacker.HandleLightAttack();
             }
         }
 
