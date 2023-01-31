@@ -46,7 +46,7 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""LockOnTargetLeft"",
+                    ""name"": ""LockLeft"",
                     ""type"": ""Button"",
                     ""id"": ""02f68da5-fc46-4c2e-9127-a5b4552d2ea2"",
                     ""expectedControlType"": ""Button"",
@@ -55,7 +55,7 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""LockOnTargetRight"",
+                    ""name"": ""LockRight"",
                     ""type"": ""Button"",
                     ""id"": ""c76275e3-b6d2-458a-92d9-de13b6fd0600"",
                     ""expectedControlType"": ""Button"",
@@ -215,7 +215,7 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                     ""interactions"": ""Press(pressPoint=0.25)"",
                     ""processors"": ""AxisDeadzone"",
                     ""groups"": """",
-                    ""action"": ""LockOnTargetLeft"",
+                    ""action"": ""LockLeft"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -226,7 +226,7 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""LockOnTargetLeft"",
+                    ""action"": ""LockLeft"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -237,7 +237,7 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                     ""interactions"": ""Press(pressPoint=0.25)"",
                     ""processors"": ""AxisDeadzone"",
                     ""groups"": """",
-                    ""action"": ""LockOnTargetRight"",
+                    ""action"": ""LockRight"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -248,7 +248,7 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""LockOnTargetRight"",
+                    ""action"": ""LockRight"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -268,7 +268,7 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""LockOn"",
+                    ""name"": ""Lock"",
                     ""type"": ""Button"",
                     ""id"": ""f9c2f6c7-4c0a-42c2-818e-fbd0c80d8027"",
                     ""expectedControlType"": ""Button"",
@@ -316,7 +316,7 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""LockOn"",
+                    ""action"": ""Lock"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -327,7 +327,7 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""LockOn"",
+                    ""action"": ""Lock"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -362,12 +362,12 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
         m_PlayerMovement = asset.FindActionMap("Player Movement", throwIfNotFound: true);
         m_PlayerMovement_Movement = m_PlayerMovement.FindAction("Movement", throwIfNotFound: true);
         m_PlayerMovement_Camera = m_PlayerMovement.FindAction("Camera", throwIfNotFound: true);
-        m_PlayerMovement_LockOnTargetLeft = m_PlayerMovement.FindAction("LockOnTargetLeft", throwIfNotFound: true);
-        m_PlayerMovement_LockOnTargetRight = m_PlayerMovement.FindAction("LockOnTargetRight", throwIfNotFound: true);
+        m_PlayerMovement_LockLeft = m_PlayerMovement.FindAction("LockLeft", throwIfNotFound: true);
+        m_PlayerMovement_LockRight = m_PlayerMovement.FindAction("LockRight", throwIfNotFound: true);
         // Player Actions
         m_PlayerActions = asset.FindActionMap("Player Actions", throwIfNotFound: true);
         m_PlayerActions_Jump = m_PlayerActions.FindAction("Jump", throwIfNotFound: true);
-        m_PlayerActions_LockOn = m_PlayerActions.FindAction("LockOn", throwIfNotFound: true);
+        m_PlayerActions_Lock = m_PlayerActions.FindAction("Lock", throwIfNotFound: true);
         m_PlayerActions_Guard = m_PlayerActions.FindAction("Guard", throwIfNotFound: true);
     }
 
@@ -430,16 +430,16 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
     private IPlayerMovementActions m_PlayerMovementActionsCallbackInterface;
     private readonly InputAction m_PlayerMovement_Movement;
     private readonly InputAction m_PlayerMovement_Camera;
-    private readonly InputAction m_PlayerMovement_LockOnTargetLeft;
-    private readonly InputAction m_PlayerMovement_LockOnTargetRight;
+    private readonly InputAction m_PlayerMovement_LockLeft;
+    private readonly InputAction m_PlayerMovement_LockRight;
     public struct PlayerMovementActions
     {
         private @PlayerControl m_Wrapper;
         public PlayerMovementActions(@PlayerControl wrapper) { m_Wrapper = wrapper; }
         public InputAction @Movement => m_Wrapper.m_PlayerMovement_Movement;
         public InputAction @Camera => m_Wrapper.m_PlayerMovement_Camera;
-        public InputAction @LockOnTargetLeft => m_Wrapper.m_PlayerMovement_LockOnTargetLeft;
-        public InputAction @LockOnTargetRight => m_Wrapper.m_PlayerMovement_LockOnTargetRight;
+        public InputAction @LockLeft => m_Wrapper.m_PlayerMovement_LockLeft;
+        public InputAction @LockRight => m_Wrapper.m_PlayerMovement_LockRight;
         public InputActionMap Get() { return m_Wrapper.m_PlayerMovement; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -455,12 +455,12 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                 @Camera.started -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnCamera;
                 @Camera.performed -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnCamera;
                 @Camera.canceled -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnCamera;
-                @LockOnTargetLeft.started -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnLockOnTargetLeft;
-                @LockOnTargetLeft.performed -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnLockOnTargetLeft;
-                @LockOnTargetLeft.canceled -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnLockOnTargetLeft;
-                @LockOnTargetRight.started -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnLockOnTargetRight;
-                @LockOnTargetRight.performed -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnLockOnTargetRight;
-                @LockOnTargetRight.canceled -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnLockOnTargetRight;
+                @LockLeft.started -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnLockLeft;
+                @LockLeft.performed -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnLockLeft;
+                @LockLeft.canceled -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnLockLeft;
+                @LockRight.started -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnLockRight;
+                @LockRight.performed -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnLockRight;
+                @LockRight.canceled -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnLockRight;
             }
             m_Wrapper.m_PlayerMovementActionsCallbackInterface = instance;
             if (instance != null)
@@ -471,12 +471,12 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                 @Camera.started += instance.OnCamera;
                 @Camera.performed += instance.OnCamera;
                 @Camera.canceled += instance.OnCamera;
-                @LockOnTargetLeft.started += instance.OnLockOnTargetLeft;
-                @LockOnTargetLeft.performed += instance.OnLockOnTargetLeft;
-                @LockOnTargetLeft.canceled += instance.OnLockOnTargetLeft;
-                @LockOnTargetRight.started += instance.OnLockOnTargetRight;
-                @LockOnTargetRight.performed += instance.OnLockOnTargetRight;
-                @LockOnTargetRight.canceled += instance.OnLockOnTargetRight;
+                @LockLeft.started += instance.OnLockLeft;
+                @LockLeft.performed += instance.OnLockLeft;
+                @LockLeft.canceled += instance.OnLockLeft;
+                @LockRight.started += instance.OnLockRight;
+                @LockRight.performed += instance.OnLockRight;
+                @LockRight.canceled += instance.OnLockRight;
             }
         }
     }
@@ -486,14 +486,14 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
     private readonly InputActionMap m_PlayerActions;
     private IPlayerActionsActions m_PlayerActionsActionsCallbackInterface;
     private readonly InputAction m_PlayerActions_Jump;
-    private readonly InputAction m_PlayerActions_LockOn;
+    private readonly InputAction m_PlayerActions_Lock;
     private readonly InputAction m_PlayerActions_Guard;
     public struct PlayerActionsActions
     {
         private @PlayerControl m_Wrapper;
         public PlayerActionsActions(@PlayerControl wrapper) { m_Wrapper = wrapper; }
         public InputAction @Jump => m_Wrapper.m_PlayerActions_Jump;
-        public InputAction @LockOn => m_Wrapper.m_PlayerActions_LockOn;
+        public InputAction @Lock => m_Wrapper.m_PlayerActions_Lock;
         public InputAction @Guard => m_Wrapper.m_PlayerActions_Guard;
         public InputActionMap Get() { return m_Wrapper.m_PlayerActions; }
         public void Enable() { Get().Enable(); }
@@ -507,9 +507,9 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                 @Jump.started -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnJump;
                 @Jump.performed -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnJump;
                 @Jump.canceled -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnJump;
-                @LockOn.started -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnLockOn;
-                @LockOn.performed -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnLockOn;
-                @LockOn.canceled -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnLockOn;
+                @Lock.started -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnLock;
+                @Lock.performed -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnLock;
+                @Lock.canceled -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnLock;
                 @Guard.started -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnGuard;
                 @Guard.performed -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnGuard;
                 @Guard.canceled -= m_Wrapper.m_PlayerActionsActionsCallbackInterface.OnGuard;
@@ -520,9 +520,9 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
                 @Jump.started += instance.OnJump;
                 @Jump.performed += instance.OnJump;
                 @Jump.canceled += instance.OnJump;
-                @LockOn.started += instance.OnLockOn;
-                @LockOn.performed += instance.OnLockOn;
-                @LockOn.canceled += instance.OnLockOn;
+                @Lock.started += instance.OnLock;
+                @Lock.performed += instance.OnLock;
+                @Lock.canceled += instance.OnLock;
                 @Guard.started += instance.OnGuard;
                 @Guard.performed += instance.OnGuard;
                 @Guard.canceled += instance.OnGuard;
@@ -534,13 +534,13 @@ public partial class @PlayerControl : IInputActionCollection2, IDisposable
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnCamera(InputAction.CallbackContext context);
-        void OnLockOnTargetLeft(InputAction.CallbackContext context);
-        void OnLockOnTargetRight(InputAction.CallbackContext context);
+        void OnLockLeft(InputAction.CallbackContext context);
+        void OnLockRight(InputAction.CallbackContext context);
     }
     public interface IPlayerActionsActions
     {
         void OnJump(InputAction.CallbackContext context);
-        void OnLockOn(InputAction.CallbackContext context);
+        void OnLock(InputAction.CallbackContext context);
         void OnGuard(InputAction.CallbackContext context);
     }
 }

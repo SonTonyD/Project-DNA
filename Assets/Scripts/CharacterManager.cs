@@ -7,9 +7,9 @@ namespace DNA
     public class CharacterManager : MonoBehaviour
     {
         [SerializeField]
-        private Transform _lockOnTransform;
+        private Transform _lockTransform;
 
-        public Transform LockOnTransform { get => _lockOnTransform; set => _lockOnTransform = value; }
+        public Transform LockTransform { get => _lockTransform; set => _lockTransform = value; }
     }
 }
 
