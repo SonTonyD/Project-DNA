@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -8,7 +6,7 @@ namespace DNA
     public class PlayerManager : CharacterManager
     {
         private InputHandler _inputHandler;
-        private Animator _anim;
+        private Animator _animator;
         private CameraHandler _cameraHandler;
         private PlayerMovement _playerMovement;
         private const float _HeightComputeConstant = 0.15f;
@@ -18,38 +16,47 @@ namespace DNA
         private const float _DefaultMinMoveDistance = 0.001f;
         private const float _DefaultRadius = 0.3f;
 
-
+        
         private void Awake()
         {
             _inputHandler = GetComponent<InputHandler>();
-            _anim = GetComponentInChildren<Animator>();
+            _animator = GetComponentInChildren<Animator>();
             _playerMovement = GetComponent<PlayerMovement>();
 
             InitializeCharacterController();
         }
 
-        void Start()
+        private void Start()
         {
             _cameraHandler = CameraHandler.singleton;
         }
 
-        void Update()
+        private void Update()
         {
+            // Time between frames for all the program
             float delta = Time.deltaTime;
 
+            // Camera control and movements
             if (_cameraHandler != null)
             {
                 _cameraHandler.FollowTarget(delta);
                 _cameraHandler.HandleCameraRotation(delta, _inputHandler.MouseX, _inputHandler.MouseY);
             }
 
-            _playerMovement.GroundedCheck();
-            _playerMovement.HandleJumping(delta);
-            _playerMovement.HandleDodge(delta);
-            _playerMovement.HandleMovement(delta);
+            // Character control and movements
+            _playerMovement.HandleGroundedCheck();
+            _playerMovement.HandleJump(delta);
+            _playerMovement.HandleStep(delta);
+            _playerMovement.HandleMovements(delta);
             _playerMovement.HandleAttack(delta);
         }
 
+        /// <summary>
+        /// Sets up the Character Controller with default constants
+        /// </summary>
+        /// <remarks>
+        /// The height computation is temporary because we will use models with known constant sizes
+        /// </remarks>
         private void InitializeCharacterController()
         {
             CharacterController controller = _playerMovement.GetComponent<CharacterController>();

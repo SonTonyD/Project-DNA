@@ -356,7 +356,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 801597de3139dfa4fb5a8648a8ce5f2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _lockOnTransform: {fileID: 1744981864}
+  _lockTransform: {fileID: 1744981864}
 --- !u!4 &71925520
 Transform:
   m_ObjectHideFlags: 0
@@ -653,7 +653,7 @@ GameObject:
   m_Component:
   - component: {fileID: 105552482}
   m_Layer: 0
-  m_Name: LockOnTransform
+  m_Name: LockTransform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -902,15 +902,11 @@ MonoBehaviour:
   _groundedOffset: -0.08
   _didSecondJump: 0
   _verticalVelocity: 0
-  _horizontalVelocity: {x: 0, y: 0, z: 0}
   _terminalVelocity: 50
-  _isDodging: 0
-  _movementSpeed: 8
-  _rotationSpeed: 10
-  _jumpHeight: 2
-  _gravity: -15
-  _sprintSpeed: 12
-  _speedModulation: 0
+  _horizontalVelocity: {x: 0, y: 0, z: 0}
+  _isStepping: 0
+  _stepPower: 5
+  _stepDuration: 0.25
 --- !u!114 &206747141
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -923,25 +919,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e57a9df935f0aa34d927612791049ae0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _cameraHandler: {fileID: 0}
   _horizontal: 0
   _vertical: 0
   _moveAmount: 0
   _mouseX: 0
   _mouseY: 0
-  _a_Input: 0
+  _isMoveDisabled: 0
+  _aInput: 0
   _jumpFlag: 0
   _isTimerStarted: 0
   _walkStartTime: 0
   _sprintFlag: 0
-  _dodgeFlag: 0
-  _lockOnInput: 0
-  _rightStick_Right_Input: 0
-  _rightStick_Left_Input: 0
-  _lockOnFlag: 0
-  _lockOnRightFlag: 0
-  _lockOnLeftFlag: 0
-  _cameraHandler: {fileID: 0}
-  _isMoveDisabled: 0
+  _stepFlag: 0
+  _rsInput: 0
+  _rsRightInput: 0
+  _rsLeftInput: 0
+  _lockFlag: 0
+  _lockRightFlag: 0
+  _lockLeftFlag: 0
 --- !u!4 &206747144
 Transform:
   m_ObjectHideFlags: 0
@@ -990,7 +986,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ed4be93139ed7c489c5e46de83d1768, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _lockOnTransform: {fileID: 1282573166}
+  _lockTransform: {fileID: 1282573166}
 --- !u!114 &206747147
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5175,7 +5171,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2113429200}
   m_Layer: 0
-  m_Name: LockOnTransform
+  m_Name: LockTransform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
