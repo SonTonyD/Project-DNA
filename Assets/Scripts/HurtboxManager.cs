@@ -19,9 +19,10 @@ namespace DNA
             }
         }
 
-        public void TakeDamage()
+
+        public void TakeDamage(int damage)
         {
-            _characterStats.Health -= 10;
+            _characterStats.CurrentHealth -= damage;
         }
 
 

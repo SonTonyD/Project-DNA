@@ -6,13 +6,13 @@ namespace DNA
 {
     public class EnemyManager : CharacterManager
     {
-        private Hitbox _hitbox;
+        private HitboxHandler _hitbox;
 
         private void Awake()
         {
-            if (GetComponentInChildren<Hitbox>())
+            if (GetComponentInChildren<HitboxHandler>())
             {
-                _hitbox = GetComponentInChildren<Hitbox>();
+                _hitbox = GetComponentInChildren<HitboxHandler>();
             }
         }
 
@@ -20,9 +20,8 @@ namespace DNA
         {
             if (_hitbox)
             {
-                List<int> activeFrames = new() { 3 };
-                Attack attack = Attack.CreateInstance(activeFrames, 32, _hitbox);
-                attack.LaunchAttack();
+                //List<int> activeFrames = new() { 3 };
+                //Attack attack = new Attack(activeFrames, 32, _hitbox);
             }
         }
     }

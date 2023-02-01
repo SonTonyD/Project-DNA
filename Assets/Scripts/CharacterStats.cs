@@ -7,14 +7,16 @@ namespace DNA
     public class CharacterStats : MonoBehaviour
     {
         [SerializeField]
-        private int _health;
+        private int _maxHealth = 100;
+        [SerializeField]
+        private int _currentHealth;
 
         private void Start()
         {
-            _health = 100;
+            _currentHealth = _maxHealth;
         }
 
-        public int Health { get => _health; set => _health = value; }
+        public int CurrentHealth { get => _currentHealth; set => _currentHealth = value; }
     }
 }
 
