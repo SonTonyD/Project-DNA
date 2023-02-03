@@ -17,7 +17,6 @@ namespace DNA
 
         private int _lastRecoveryFrame;
         private List<int> _activeFrames;
-        private int _cancelFrame;
         private int _damage;
 
         private int _counter;
@@ -46,25 +45,20 @@ namespace DNA
                 Hurtbox hurtbox = other.gameObject.GetComponent<Hurtbox>();
                 if (hurtbox != null && hurtbox.HurtboxManager != null)
                 {
-                    hurtbox.HurtboxManager.TakeDamage(_damage);
+                    hurtbox.HurtboxManager.TakeDamage(_damage, _counter, _activeFrames);
                 }
             }
         }
 
         public void Apply()
         {
-            if (_activeFrames.Contains(_counter) && !_boxCollider.enabled)
+            if (_activeFrames.Contains(_counter) && _boxCollider.enabled == false)
             {
                 EnableHitbox();
             }
             else
             {
                 DisableHitbox();
-            }
-
-            if (_counter > _cancelFrame)
-            {
-                DisableMovement(false);
             }
             
             if (_counter > _lastRecoveryFrame)
@@ -89,6 +83,7 @@ namespace DNA
 
         private void EndAttack()
         {
+            DisableMovement(false);
             _isAttacking = false;
             _playerAttacker.IsAntiSpamActivated = false;
             _counter = 0;
@@ -106,7 +101,6 @@ namespace DNA
         {
             this._activeFrames = attack.ActiveFrames;
             this._lastRecoveryFrame = attack.LastRecoveryFrame;
-            this._cancelFrame = attack.CancelFrame;
             this._damage = attack.Damage;
             _isAttacking = true;
         }

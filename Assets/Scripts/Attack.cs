@@ -19,8 +19,6 @@ namespace DNA
 
         [Header("Attack Frame Parameters")]
         [SerializeField]
-        private int _cancelFrame;
-        [SerializeField]
         private int _lastRecoveryFrame;
         [SerializeField]
         private List<int> _activeFrames;
@@ -38,7 +36,6 @@ namespace DNA
         public List<int> ActiveFrames { get => _activeFrames; set => _activeFrames = value; }
         public float HitboxRange { get => _hitboxRange; set => _hitboxRange = value; }
         public float HitboxSpawnHeight { get => _hitboxSpawnHeight; set => _hitboxSpawnHeight = value; }
-        public int CancelFrame { get => _cancelFrame; set => _cancelFrame = value; }
         public int Damage { get => _damage; set => _damage = value; }
     }
 }
