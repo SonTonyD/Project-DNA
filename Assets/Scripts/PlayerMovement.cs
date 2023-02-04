@@ -69,7 +69,17 @@ namespace DNA
         private const float _StepPowerMultiplier = 100f;
         private const float _OrthogonalStepInputThreshold = 0.9f;
         private const float _AntiSpiralConstant = 0.0425f;
-        private const float _MinimalStepMovementInput = 0.15f;
+        private const float _MinimalStepMovementInput = 0.5f;
+
+        [Header("Dash Variables")]
+        [SerializeField]
+        private bool _isDashing = false;
+        [SerializeField]
+        private Vector3 _dashVelocity = Vector3.zero;
+        [SerializeField]
+        private float _dashPower = 6f;
+
+        private const float _DashPowerMultiplier = 100f;
 
         public CharacterController Controller { get => _controller; set => _controller = value; }
 
@@ -111,6 +121,10 @@ namespace DNA
                 targetDirection = (_cameraHandler.CurrentLockTarget.transform.position - transform.position);
                 Vector3 perpendicularVector = Vector3.Cross(targetDirection, Vector3.up);
                 targetDirection += -perpendicularVector * _inputHandler.Horizontal;
+            }
+            else if (_isDashing)
+            {
+                targetDirection = (_cameraHandler.CurrentLockTarget.transform.position - transform.position);
             }
             else
             {
@@ -188,6 +202,10 @@ namespace DNA
             {
                 _controller.Move(new Vector3(_horizontalVelocity.x, _verticalVelocity, _horizontalVelocity.z) * delta);
             }
+            if (_isDashing)
+            {
+                _controller.Move(_dashVelocity * delta);
+            }
             else
             {
                 _controller.Move(_moveDirection.normalized * (speed * _speedModulation * delta) + new Vector3(0.0f, _verticalVelocity, 0.0f) * delta);
@@ -212,14 +230,14 @@ namespace DNA
             _animatorHandler.PlayAnimation(_animatorHandler.JumpString, false);
 
             // If the jump flag is true and the character is grounded, make the character jump
-            if (_inputHandler.JumpFlag && _isGrounded && !_isStepping)
+            if (_inputHandler.JumpFlag && _isGrounded && !_isStepping && !_isDashing)
             {
                 _didSecondJump = false;
                 _animatorHandler.PlayAnimation(_animatorHandler.JumpString, true);
                 _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
             }
             // If the jump flag is true and the character is in air and did not do a second jump, make the character jump
-            else if (_inputHandler.JumpFlag && !_isGrounded && !_didSecondJump && !_isStepping)
+            else if (_inputHandler.JumpFlag && !_isGrounded && !_didSecondJump && !_isStepping && !_isDashing)
             {
                 _didSecondJump = true;
                 _animatorHandler.PlayAnimation(_animatorHandler.JumpString, true);
@@ -254,9 +272,17 @@ namespace DNA
             {
                 Vector2 movementInput;
 
+                // Takes movement inputs for the start of the step then keep them until the end of the step
                 if (!_isStepping)
                 {
                     movementInput = _inputHandler.MovementInput;
+
+                    // If movement input too low, do not step
+                    if (Mathf.Abs(movementInput.x) + Mathf.Abs(movementInput.y) < _MinimalStepMovementInput)
+                    {
+                        return;
+                    }
+
                     _currentStepMovementInput = movementInput;
                 }
                 else
@@ -270,6 +296,7 @@ namespace DNA
                     _moveDirection = _cameraObject.forward * movementInput.y;
                     _moveDirection += _cameraObject.right * movementInput.x;
                 }
+                // Step when locking
                 else
                 {
                     Vector2 normalizedMovementInput = movementInput.normalized;
@@ -280,8 +307,8 @@ namespace DNA
                     if (Mathf.Abs(normalizedMovementInput.y) <= _OrthogonalStepInputThreshold &&
                         Mathf.Abs(normalizedMovementInput.x) <= _OrthogonalStepInputThreshold)
                     {
-                        _moveDirection = stepTransformForward * movementInput.y;
-                        _moveDirection += stepTransformRight * movementInput.x;
+                        _moveDirection = _cameraObject.forward * movementInput.y;
+                        _moveDirection += _cameraObject.right * movementInput.x;
                     }
                     // Front and back step
                     else if (Mathf.Abs(normalizedMovementInput.y) > _OrthogonalStepInputThreshold)
@@ -310,10 +337,11 @@ namespace DNA
 
                     _horizontalVelocity = Mathf.Sqrt(_stepPower * _StepPowerMultiplier) * _moveDirection.normalized;
 
-                    // Wait for step duration to end to reset step variables
                     if (!_isStepping)
                     {
+                        _isDashing = false;
                         _isStepping = true;
+                        // Wait for step duration to end to reset step variables
                         _animatorHandler.PlayAnimation(_animatorHandler.StepString, true);
                         Invoke(nameof(ResetStep), _stepDuration);
                     }
@@ -330,6 +358,39 @@ namespace DNA
             _horizontalVelocity = Vector3.zero;
             _currentStepMovementInput = Vector2.zero;
             _isStepping = false;
+        }
+
+        /// <summary>
+        /// Makes the character do a homing dash
+        /// </summary>
+        /// <param name="delta">Time between frames</param>
+        public void HandleDash(float delta)
+        {
+            if ((_inputHandler.DashFlag && _cameraHandler.CurrentLockTarget != null) ||
+                _isDashing)
+            {
+                _isStepping = false;
+
+                Vector3 _moveDirection = (_cameraHandler.CurrentLockTarget.transform.position - _characterTransform.position).normalized;
+                _horizontalVelocity = Mathf.Sqrt(_stepPower * _StepPowerMultiplier) * _moveDirection.normalized;
+                
+                if (_isGrounded)
+                {
+                    _moveDirection.y = -0.5f;
+                }
+
+                _dashVelocity = Mathf.Sqrt(_dashPower * _DashPowerMultiplier) * _moveDirection.normalized;
+
+                _isDashing = true;
+
+                // Stop homing dash when near lock target => TODO: replace by collider collision with floor, wall and other entities
+                float distance = Vector3.Distance(_cameraHandler.CurrentLockTarget.transform.position, _characterTransform.position);
+
+                if (distance < 1.8f || _isStepping)
+                {
+                    _isDashing = false;
+                }
+            }
         }
 
         /// <summary>
