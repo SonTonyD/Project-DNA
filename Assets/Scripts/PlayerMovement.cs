@@ -64,8 +64,12 @@ namespace DNA
         [SerializeField]
         private float _stepDuration = 0.25f;
 
+        private Vector2 _currentStepMovementInput;
+
         private const float _StepPowerMultiplier = 100f;
         private const float _OrthogonalStepInputThreshold = 0.9f;
+        private const float _AntiSpiralConstant = 0.0425f;
+        private const float _MinimalStepMovementInput = 0.15f;
 
         public CharacterController Controller { get => _controller; set => _controller = value; }
 
@@ -245,46 +249,58 @@ namespace DNA
         /// <param name="delta">Time between frames</param>
         public void HandleStep(float delta)
         {
-            if (_inputHandler.StepFlag)
+            if ((_inputHandler.StepFlag && !_isStepping) ||
+                (_isStepping && _cameraHandler.CurrentLockTarget != null))
             {
-                Vector2 normalizedMovementInput = _inputHandler.MovementInput.normalized;
-                Vector3 stepTransformForward;
-                Vector3 stepTransformRight;
+                Vector2 movementInput;
+
+                if (!_isStepping)
+                {
+                    movementInput = _inputHandler.MovementInput;
+                    _currentStepMovementInput = movementInput;
+                }
+                else
+                {
+                    movementInput = _currentStepMovementInput;
+                }
 
                 // Set step direction
                 if (_cameraHandler.CurrentLockTarget == null)
                 {
-                    stepTransformForward = _cameraObject.forward;
-                    stepTransformRight = _cameraObject.right;
+                    _moveDirection = _cameraObject.forward * movementInput.y;
+                    _moveDirection += _cameraObject.right * movementInput.x;
                 }
                 else
                 {
-                    stepTransformForward = (_cameraHandler.CurrentLockTarget.transform.position - transform.position).normalized;
-                    stepTransformRight = -Vector3.Cross(stepTransformForward, Vector3.up);
-                }
+                    Vector2 normalizedMovementInput = movementInput.normalized;
+                    Vector3 stepTransformForward = (_cameraHandler.CurrentLockTarget.transform.position - _characterTransform.position).normalized;
+                    Vector3 stepTransformRight = -Vector3.Cross(stepTransformForward, Vector3.up);
 
-                // Free direction step
-                if (Mathf.Abs(normalizedMovementInput.y) <= _OrthogonalStepInputThreshold &&
-                    Mathf.Abs(normalizedMovementInput.x) <= _OrthogonalStepInputThreshold)
-                {
-                    _moveDirection = stepTransformForward * _inputHandler.MovementInput.y;
-                    _moveDirection += stepTransformRight * _inputHandler.MovementInput.x;
-                }
-                // Front and back step
-                else if (Mathf.Abs(normalizedMovementInput.y) > _OrthogonalStepInputThreshold)
-                {
-                    _moveDirection = stepTransformForward * _inputHandler.MovementInput.y;
-                }
-                // Side step
-                else if (Mathf.Abs(normalizedMovementInput.x) > _OrthogonalStepInputThreshold)
-                {
-                    _moveDirection = stepTransformRight * _inputHandler.MovementInput.x;
+                    // Free direction step
+                    if (Mathf.Abs(normalizedMovementInput.y) <= _OrthogonalStepInputThreshold &&
+                        Mathf.Abs(normalizedMovementInput.x) <= _OrthogonalStepInputThreshold)
+                    {
+                        _moveDirection = stepTransformForward * movementInput.y;
+                        _moveDirection += stepTransformRight * movementInput.x;
+                    }
+                    // Front and back step
+                    else if (Mathf.Abs(normalizedMovementInput.y) > _OrthogonalStepInputThreshold)
+                    {
+                        _moveDirection = stepTransformForward * movementInput.y;
+                    }
+                    // Side step
+                    else if (Mathf.Abs(normalizedMovementInput.x) > _OrthogonalStepInputThreshold)
+                    {
+                        _moveDirection = stepTransformForward * _AntiSpiralConstant;
+                        _moveDirection += stepTransformRight * movementInput.x;
+                    }
                 }
 
                 _moveDirection.y = 0;
 
                 // If the player inputs a direction and the character is not already stepping, rotate character in the direction and make step
-                if (_moveDirection != Vector3.zero && !_isStepping)
+                if ((_moveDirection != Vector3.zero && !_isStepping) ||
+                    _isStepping && _cameraHandler.CurrentLockTarget != null)
                 {
                     if (_cameraHandler.CurrentLockTarget == null)
                     {
@@ -292,12 +308,15 @@ namespace DNA
                         _characterTransform.rotation = lookRotation;
                     }
 
-                    _isStepping = true;
-                    _animatorHandler.PlayAnimation(_animatorHandler.StepString, true);
                     _horizontalVelocity = Mathf.Sqrt(_stepPower * _StepPowerMultiplier) * _moveDirection.normalized;
 
                     // Wait for step duration to end to reset step variables
-                    Invoke(nameof(ResetStep), _stepDuration);
+                    if (!_isStepping)
+                    {
+                        _isStepping = true;
+                        _animatorHandler.PlayAnimation(_animatorHandler.StepString, true);
+                        Invoke(nameof(ResetStep), _stepDuration);
+                    }
                 }
             }
         }
@@ -309,6 +328,7 @@ namespace DNA
         {
             _animatorHandler.PlayAnimation(_animatorHandler.StepString, false);
             _horizontalVelocity = Vector3.zero;
+            _currentStepMovementInput = Vector2.zero;
             _isStepping = false;
         }
 
