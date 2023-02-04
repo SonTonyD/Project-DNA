@@ -17,6 +17,8 @@ namespace DNA
         private GameObject _normalCamera;
         [SerializeField]
         private CharacterController _controller;
+        [SerializeField]
+        private CameraHandler _cameraHandler;
 
         private Vector3 _moveDirection;
 
@@ -62,7 +64,7 @@ namespace DNA
         [SerializeField]
         private float _stepDuration = 0.25f;
 
-        private const float _stepPowerMultiplier = 100f;
+        private const float _StepPowerMultiplier = 100f;
 
         public CharacterController Controller { get => _controller; set => _controller = value; }
 
@@ -73,6 +75,7 @@ namespace DNA
             _inputHandler = GetComponent<InputHandler>();
             _animatorHandler = GetComponentInChildren<AnimatorHandler>();
             _cameraObject = Camera.main.transform;
+            _cameraHandler = CameraHandler.singleton;
             _characterTransform = transform;
             _animatorHandler.Initialize();
             _groundLayers = LayerMask.GetMask("Floor");
@@ -86,8 +89,21 @@ namespace DNA
         /// <param name="delta">Time between frames</param>
         private void HandleRotation(float delta)
         {
-            Vector3 targetDirection = _cameraObject.forward * _inputHandler.Vertical;
-            targetDirection += _cameraObject.right * _inputHandler.Horizontal;
+            Vector3 targetDirection;
+
+            if (_cameraHandler.CurrentLockTarget == null)
+            {
+                targetDirection = _cameraObject.forward * _inputHandler.Vertical;
+                targetDirection += _cameraObject.right * _inputHandler.Horizontal;
+            }
+            else
+            {
+                targetDirection = (_cameraHandler.CurrentLockTarget.transform.position - transform.position);
+                Vector3 perpendicularVector = Vector3.Cross(targetDirection, Vector3.up);
+                targetDirection *= _inputHandler.Vertical;
+                targetDirection += -perpendicularVector * _inputHandler.Horizontal;
+            }
+            
             targetDirection.Normalize();
             targetDirection.y = 0;
 
@@ -109,8 +125,20 @@ namespace DNA
         public void HandleMovements(float delta)
         {
             _inputHandler.HandleMovementInputs(delta);
-            _moveDirection = _cameraObject.forward * _inputHandler.Vertical;
-            _moveDirection += _cameraObject.right * _inputHandler.Horizontal;
+            
+            if (_cameraHandler.CurrentLockTarget == null)
+            {
+                _moveDirection = _cameraObject.forward * _inputHandler.Vertical;
+                _moveDirection += _cameraObject.right * _inputHandler.Horizontal;
+            }
+            else
+            {
+                Vector3 targetDirection = (_cameraHandler.CurrentLockTarget.transform.position - transform.position).normalized;
+                Vector3 perpendicularVector = Vector3.Cross(targetDirection, Vector3.up);
+                _moveDirection = targetDirection * _inputHandler.Vertical;
+                _moveDirection += -perpendicularVector * _inputHandler.Horizontal;
+            }
+
             _moveDirection.Normalize();
             _moveDirection.y = 0;
 
@@ -208,8 +236,19 @@ namespace DNA
             if (_inputHandler.StepFlag)
             {
                 // Set step direction
-                _moveDirection = _cameraObject.forward * _inputHandler.MovementInput.y;
-                _moveDirection += _cameraObject.right * _inputHandler.MovementInput.x;
+                if (_cameraHandler.CurrentLockTarget == null)
+                {
+                    _moveDirection = _cameraObject.forward * _inputHandler.MovementInput.y;
+                    _moveDirection += _cameraObject.right * _inputHandler.MovementInput.x;
+                }
+                else
+                {
+                    Vector3 targetDirection = (_cameraHandler.CurrentLockTarget.transform.position - transform.position).normalized;
+                    Vector3 perpendicularVector = Vector3.Cross(targetDirection, Vector3.up);
+                    _moveDirection = targetDirection * _inputHandler.MovementInput.y;
+                    _moveDirection += -perpendicularVector * _inputHandler.MovementInput.x;
+                }
+
                 _moveDirection.y = 0;
 
                 // If the player inputs a direction and the character is not already stepping, rotate character in the direction and make step
@@ -220,7 +259,7 @@ namespace DNA
 
                     _isStepping = true;
                     _animatorHandler.PlayAnimation(_animatorHandler.StepString, true);
-                    _horizontalVelocity = Mathf.Sqrt(_stepPower * _stepPowerMultiplier) * _moveDirection.normalized;
+                    _horizontalVelocity = Mathf.Sqrt(_stepPower * _StepPowerMultiplier) * _moveDirection.normalized;
 
                     // Wait for step duration to end to reset step variables
                     Invoke(nameof(ResetStep), _stepDuration);
