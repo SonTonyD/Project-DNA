@@ -248,50 +248,37 @@ namespace DNA
             if (_inputHandler.StepFlag)
             {
                 Vector2 normalizedMovementInput = _inputHandler.MovementInput.normalized;
+                Vector3 stepTransformForward;
+                Vector3 stepTransformRight;
 
                 // Set step direction
                 if (_cameraHandler.CurrentLockTarget == null)
                 {
-                    // Diagonal step
-                    if (Mathf.Abs(normalizedMovementInput.y) <= _OrthogonalStepInputThreshold &&
-                        Mathf.Abs(normalizedMovementInput.x) <= _OrthogonalStepInputThreshold)
-                    {
-                        _moveDirection = _cameraObject.forward * _inputHandler.MovementInput.y;
-                        _moveDirection += _cameraObject.right * _inputHandler.MovementInput.x;
-                    }
-                    // Front and back step
-                    else if (Mathf.Abs(normalizedMovementInput.y) > _OrthogonalStepInputThreshold)
-                    {
-                        _moveDirection = _cameraObject.forward * _inputHandler.MovementInput.y;
-                    }
-                    // Side step
-                    else if (Mathf.Abs(normalizedMovementInput.x) > _OrthogonalStepInputThreshold)
-                    {
-                        _moveDirection = _cameraObject.right * _inputHandler.MovementInput.x;
-                    }
+                    stepTransformForward = _cameraObject.forward;
+                    stepTransformRight = _cameraObject.right;
                 }
                 else
                 {
-                    Vector3 targetDirection = (_cameraHandler.CurrentLockTarget.transform.position - transform.position).normalized;
-                    Vector3 perpendicularVector = Vector3.Cross(targetDirection, Vector3.up);
+                    stepTransformForward = (_cameraHandler.CurrentLockTarget.transform.position - transform.position).normalized;
+                    stepTransformRight = -Vector3.Cross(stepTransformForward, Vector3.up);
+                }
 
-                    // Diagonal step
-                    if (Mathf.Abs(normalizedMovementInput.y) <= _OrthogonalStepInputThreshold &&
-                        Mathf.Abs(normalizedMovementInput.x) <= _OrthogonalStepInputThreshold)
-                    {
-                        _moveDirection = targetDirection * _inputHandler.MovementInput.y;
-                        _moveDirection += -perpendicularVector * _inputHandler.MovementInput.x;
-                    }
-                    // Front and back step
-                    else if (Mathf.Abs(normalizedMovementInput.y) > _OrthogonalStepInputThreshold)
-                    {
-                        _moveDirection = targetDirection * _inputHandler.MovementInput.y;
-                    }
-                    // Side step
-                    else if (Mathf.Abs(normalizedMovementInput.x) > _OrthogonalStepInputThreshold)
-                    {
-                        _moveDirection = -perpendicularVector * _inputHandler.MovementInput.x;
-                    }
+                // Free direction step
+                if (Mathf.Abs(normalizedMovementInput.y) <= _OrthogonalStepInputThreshold &&
+                    Mathf.Abs(normalizedMovementInput.x) <= _OrthogonalStepInputThreshold)
+                {
+                    _moveDirection = stepTransformForward * _inputHandler.MovementInput.y;
+                    _moveDirection += stepTransformRight * _inputHandler.MovementInput.x;
+                }
+                // Front and back step
+                else if (Mathf.Abs(normalizedMovementInput.y) > _OrthogonalStepInputThreshold)
+                {
+                    _moveDirection = stepTransformForward * _inputHandler.MovementInput.y;
+                }
+                // Side step
+                else if (Mathf.Abs(normalizedMovementInput.x) > _OrthogonalStepInputThreshold)
+                {
+                    _moveDirection = stepTransformRight * _inputHandler.MovementInput.x;
                 }
 
                 _moveDirection.y = 0;
@@ -306,7 +293,7 @@ namespace DNA
                     }
 
                     _isStepping = true;
-                    //_animatorHandler.PlayAnimation(_animatorHandler.StepString, true);
+                    _animatorHandler.PlayAnimation(_animatorHandler.StepString, true);
                     _horizontalVelocity = Mathf.Sqrt(_stepPower * _StepPowerMultiplier) * _moveDirection.normalized;
 
                     // Wait for step duration to end to reset step variables
