@@ -7,7 +7,7 @@ namespace DNA
     public class HurtboxManager : MonoBehaviour
     {
         private CharacterStats _characterStats;
-        private int _counter;
+        private int _frameCounter;
         private bool _isInvicible;
         private Hurtbox[] _hurtboxes;
         private int _numberOfFrameToWait;
@@ -22,19 +22,20 @@ namespace DNA
                 hurtbox.HurtboxManager = this;
             }
             _isInvicible = false;
-            _counter = 0;
+            _frameCounter = 0;
         }
 
         private void Update()
         {
+            //while the hurboxes are invicible, count the number of elasped frame. If this latter reach the number of frame to wait then make the hurboxes vulnerable again.
             if (_isInvicible == true)
             {
-                _counter++;
+                _frameCounter++;
 
-                if (_counter > _numberOfFrameToWait)
+                if (_frameCounter > _numberOfFrameToWait)
                 {
                     _isInvicible = false;
-                    _counter = 0;
+                    _frameCounter = 0;
                 }
             }
         }
@@ -54,10 +55,11 @@ namespace DNA
                 //Debug.Log($"Take Damage at frame: {currentFrame}");
                 //Debug.Log($"numberOfFrameToWait: {_numberOfFrameToWait} , {lastConsecutiveInteger} , {currentFrame} , {activeFrames.IndexOf(currentFrame)}");
             }
-
-
         }
 
+        /// <summary>
+        /// Get the last frame of a hit which is the last integer of the first encountered consecutive list of active frames
+        /// </summary>
         static int GetLastConsecutiveInteger(List<int> list, int startIndex)
         {
             int lastConsecutiveInt = -1;

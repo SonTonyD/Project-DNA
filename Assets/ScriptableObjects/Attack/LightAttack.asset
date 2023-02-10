@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: LightAttack
   _hitbox: {fileID: 4970568153081585898, guid: 4eb7ecff9cd41524288bf6253dee5eee, type: 3}
-  _damage: 2
+  _damage: 1
   _lastRecoveryFrame: 32
-  _activeFrames: 030000000400000005000000070000000800000009000000
+  _activeFrames: 0d0000000e0000000f00000010000000110000001200000013000000140000001600000017000000190000001a0000001b000000
   _hitboxRange: 2
   _hitboxSpawnHeight: 1.3
