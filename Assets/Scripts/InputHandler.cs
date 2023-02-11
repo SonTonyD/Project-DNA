@@ -252,11 +252,11 @@ namespace DNA
             if (GetGuardInput())
             {
                 _isMoveDisabled = true;
-                if (Mathf.Abs(_movementInput.x) + Mathf.Abs(_movementInput.y) > 0.0f)
+                if (Mathf.Abs(_horizontal) + Mathf.Abs(_vertical) > 0.0f)
                 {
                     _stepFlag = true;
                 }
-                else if (Mathf.Abs(_movementInput.x) + Mathf.Abs(_movementInput.y) == 0.0f)
+                else if (Mathf.Abs(_horizontal) + Mathf.Abs(_vertical) == 0.0f)
                 {
                     _stepFlag = false;
                 }
