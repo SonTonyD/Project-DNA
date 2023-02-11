@@ -62,8 +62,20 @@ namespace DNA
         [SerializeField]
         private float _stepPower = 5f;
         [SerializeField]
-        private float _stepDuration = 0.25f;
-
+        private int _stepStartupFrameNumber = 4;
+        [SerializeField]
+        private int _stepActiveFrameNumber = 15;
+        [SerializeField]
+        private int _stepRecoveryFrameNumber = 10;
+        [SerializeField]
+        private bool _isRecoveringFromStep = false;
+        [SerializeField]
+        private int _stepFrameCount = 1;
+        [SerializeField]
+        private bool _isStepFrameCountStarted = false;
+        [SerializeField]
+        private Vector2 _stepMovementInput;
+        [SerializeField]
         private Vector2 _currentStepMovementInput;
 
         private const float _StepPowerMultiplier = 100f;
@@ -78,6 +90,14 @@ namespace DNA
         private Vector3 _dashVelocity = Vector3.zero;
         [SerializeField]
         private float _dashPower = 6f;
+        [SerializeField]
+        private int _dashStartupFrameNumber = 8;
+        //[SerializeField]
+        //private int _dashRecoveryFrameNumber = 20;
+        [SerializeField]
+        private int _dashFrameCount = 1;
+        [SerializeField]
+        private bool _isDashFrameCountStarted = false;
 
         private const float _DashPowerMultiplier = 100f;
 
@@ -268,83 +288,131 @@ namespace DNA
         public void HandleStep(float delta)
         {
             if ((_inputHandler.StepFlag && !_isStepping) ||
-                (_isStepping && _cameraHandler.CurrentLockTarget != null))
+                (_isStepping && _cameraHandler.CurrentLockTarget != null) ||
+                (_isStepping && _isRecoveringFromStep) ||
+                (_isStepFrameCountStarted))
             {
-                Vector2 movementInput;
-
-                // Takes movement inputs for the start of the step then keep them until the end of the step
-                if (!_isStepping)
+                // Start count for startup
+                if (!_isStepFrameCountStarted)
                 {
-                    movementInput = _inputHandler.MovementInput;
+                    _stepMovementInput = _inputHandler.MovementInput;
 
                     // If movement input too low, do not step
-                    if (Mathf.Abs(movementInput.x) + Mathf.Abs(movementInput.y) < _MinimalStepMovementInput)
+                    if (Mathf.Abs(_stepMovementInput.x) + Mathf.Abs(_stepMovementInput.y) > _MinimalStepMovementInput)
                     {
-                        return;
+                        _isStepFrameCountStarted = true;
+                    }
+                }
+                // After startup
+                else if (_isStepFrameCountStarted && _stepFrameCount > _stepStartupFrameNumber &&
+                    _stepFrameCount <= _stepStartupFrameNumber + _stepActiveFrameNumber + _stepRecoveryFrameNumber)
+                {
+                    // Set recovery bool after active frames
+                    if (!_isRecoveringFromStep && _stepFrameCount > _stepStartupFrameNumber + _stepActiveFrameNumber)
+                    {
+                        _isRecoveringFromStep = true;
                     }
 
-                    _currentStepMovementInput = movementInput;
+                    SetStepMoveDirection();
+                    ExecuteStep();
                 }
-                else
+                // After recovery frames, reset step
+                else if (_isStepFrameCountStarted && _stepFrameCount > _stepStartupFrameNumber + _stepActiveFrameNumber + _stepRecoveryFrameNumber)
                 {
-                    movementInput = _currentStepMovementInput;
+                    ResetStep();
                 }
+            }
 
-                // Set step direction
+            // Increment frame count
+            if (_isStepFrameCountStarted)
+            {
+                _stepFrameCount += 1;
+            }
+        }
+
+        /// <summary>
+        /// Computes and sets/updates the step move direction
+        /// </summary>
+        private void SetStepMoveDirection()
+        {
+            // Takes movement inputs for the start of the step then keep them until the end of the step
+            if (!_isStepping)
+            {
+                _currentStepMovementInput = _stepMovementInput;
+            }
+            else
+            {
+                _stepMovementInput = _currentStepMovementInput;
+            }
+
+            // Set step direction
+            if (_cameraHandler.CurrentLockTarget == null)
+            {
+                _moveDirection = _cameraObject.forward * _stepMovementInput.y;
+                _moveDirection += _cameraObject.right * _stepMovementInput.x;
+            }
+            // Step when locking
+            else
+            {
+                Vector2 normalizedMovementInput = _stepMovementInput.normalized;
+                Vector3 stepTransformForward = (_cameraHandler.CurrentLockTarget.transform.position - _characterTransform.position).normalized;
+                Vector3 stepTransformRight = -Vector3.Cross(stepTransformForward, Vector3.up);
+
+                // Free direction step
+                if (Mathf.Abs(normalizedMovementInput.y) <= _OrthogonalStepInputThreshold &&
+                    Mathf.Abs(normalizedMovementInput.x) <= _OrthogonalStepInputThreshold)
+                {
+                    _moveDirection = _cameraObject.forward * _stepMovementInput.y;
+                    _moveDirection += _cameraObject.right * _stepMovementInput.x;
+                }
+                // Front and back step
+                else if (Mathf.Abs(normalizedMovementInput.y) > _OrthogonalStepInputThreshold)
+                {
+                    _moveDirection = stepTransformForward * _stepMovementInput.y;
+                }
+                // Side step
+                else if (Mathf.Abs(normalizedMovementInput.x) > _OrthogonalStepInputThreshold)
+                {
+                    _moveDirection = stepTransformForward * _AntiSpiralConstant;
+                    _moveDirection += stepTransformRight * _stepMovementInput.x;
+                }
+            }
+
+            _moveDirection.y = 0;
+        }
+
+        /// <summary>
+        /// Executes step action with the correct parameters and play its animation
+        /// </summary>
+        private void ExecuteStep()
+        {
+            // If the player inputs a direction and the character is not already stepping, rotate character in the direction and make step
+            if ((_moveDirection != Vector3.zero && !_isStepping) ||
+                (_isStepping && _cameraHandler.CurrentLockTarget != null) ||
+                (_isRecoveringFromStep && _isStepping))
+            {
                 if (_cameraHandler.CurrentLockTarget == null)
                 {
-                    _moveDirection = _cameraObject.forward * movementInput.y;
-                    _moveDirection += _cameraObject.right * movementInput.x;
+                    Quaternion lookRotation = Quaternion.LookRotation(_moveDirection);
+                    _characterTransform.rotation = lookRotation;
                 }
-                // Step when locking
+
+                // If recovering from step, slow down step power by a factor of 2
+                if (!_isRecoveringFromStep)
+                {
+                    _horizontalVelocity = Mathf.Sqrt(_stepPower * _StepPowerMultiplier) * _moveDirection.normalized;
+                }
                 else
                 {
-                    Vector2 normalizedMovementInput = movementInput.normalized;
-                    Vector3 stepTransformForward = (_cameraHandler.CurrentLockTarget.transform.position - _characterTransform.position).normalized;
-                    Vector3 stepTransformRight = -Vector3.Cross(stepTransformForward, Vector3.up);
-
-                    // Free direction step
-                    if (Mathf.Abs(normalizedMovementInput.y) <= _OrthogonalStepInputThreshold &&
-                        Mathf.Abs(normalizedMovementInput.x) <= _OrthogonalStepInputThreshold)
-                    {
-                        _moveDirection = _cameraObject.forward * movementInput.y;
-                        _moveDirection += _cameraObject.right * movementInput.x;
-                    }
-                    // Front and back step
-                    else if (Mathf.Abs(normalizedMovementInput.y) > _OrthogonalStepInputThreshold)
-                    {
-                        _moveDirection = stepTransformForward * movementInput.y;
-                    }
-                    // Side step
-                    else if (Mathf.Abs(normalizedMovementInput.x) > _OrthogonalStepInputThreshold)
-                    {
-                        _moveDirection = stepTransformForward * _AntiSpiralConstant;
-                        _moveDirection += stepTransformRight * movementInput.x;
-                    }
+                    _horizontalVelocity = Mathf.Sqrt(_stepPower / 2 * _StepPowerMultiplier) * _moveDirection.normalized;
                 }
 
-                _moveDirection.y = 0;
-
-                // If the player inputs a direction and the character is not already stepping, rotate character in the direction and make step
-                if ((_moveDirection != Vector3.zero && !_isStepping) ||
-                    _isStepping && _cameraHandler.CurrentLockTarget != null)
+                // Start step
+                if (!_isStepping)
                 {
-                    if (_cameraHandler.CurrentLockTarget == null)
-                    {
-                        Quaternion lookRotation = Quaternion.LookRotation(_moveDirection);
-                        _characterTransform.rotation = lookRotation;
-                    }
-
-                    _horizontalVelocity = Mathf.Sqrt(_stepPower * _StepPowerMultiplier) * _moveDirection.normalized;
-
-                    if (!_isStepping)
-                    {
-                        _isDashing = false;
-                        _isStepping = true;
-                        // Wait for step duration to end to reset step variables
-                        _animatorHandler.PlayAnimation(_animatorHandler.StepString, true);
-                        Invoke(nameof(ResetStep), _stepDuration);
-                    }
+                    _isDashing = false;
+                    _isStepping = true;
+                    _animatorHandler.PlayAnimation(_animatorHandler.StepString, true);
                 }
             }
         }
@@ -354,9 +422,14 @@ namespace DNA
         /// </summary>
         private void ResetStep()
         {
+            _stepFrameCount = 1;
+            _isStepFrameCountStarted = false;
             _animatorHandler.PlayAnimation(_animatorHandler.StepString, false);
             _horizontalVelocity = Vector3.zero;
+            _stepMovementInput = Vector2.zero;
             _currentStepMovementInput = Vector2.zero;
+            _isStepFrameCountStarted = false;
+            _isRecoveringFromStep = false;
             _isStepping = false;
         }
 
@@ -367,29 +440,52 @@ namespace DNA
         public void HandleDash(float delta)
         {
             if ((_inputHandler.DashFlag && _cameraHandler.CurrentLockTarget != null) ||
-                _isDashing)
+                _isDashing ||
+                _isDashFrameCountStarted)
             {
-                _isStepping = false;
-
-                Vector3 _moveDirection = (_cameraHandler.CurrentLockTarget.transform.position - _characterTransform.position).normalized;
-                _horizontalVelocity = Mathf.Sqrt(_stepPower * _StepPowerMultiplier) * _moveDirection.normalized;
-                
-                if (_isGrounded)
+                // Start count for startup
+                if (!_isDashFrameCountStarted)
                 {
-                    _moveDirection.y = -0.5f;
+                    _isStepping = false;
+                    _isDashFrameCountStarted = true;
                 }
-
-                _dashVelocity = Mathf.Sqrt(_dashPower * _DashPowerMultiplier) * _moveDirection.normalized;
-
-                _isDashing = true;
-
-                // Stop homing dash when near lock target => TODO: replace by collider collision with floor, wall and other entities
-                float distance = Vector3.Distance(_cameraHandler.CurrentLockTarget.transform.position, _characterTransform.position);
-
-                if (distance < 1.8f || _isStepping)
+                // After startup
+                else if (_isDashFrameCountStarted && _dashFrameCount > _dashStartupFrameNumber &&
+                    _dashFrameCount > _dashStartupFrameNumber /*<= _dashStartupFrameNumber + _dashActiveFrameNumber + _dashRecoveryFrameNumber*/)
                 {
-                    _isDashing = false;
+                    Vector3 _moveDirection = (_cameraHandler.CurrentLockTarget.transform.position - _characterTransform.position).normalized;
+
+                    if (_isGrounded)
+                    {
+                        _moveDirection.y = -0.15f;
+                    }
+
+                    _dashVelocity = Mathf.Sqrt(_dashPower * _DashPowerMultiplier) * _moveDirection.normalized;
+
+                    _isDashing = true;
+
+                    // Stop homing dash when near lock target => TODO: replace by collider collision with floor, wall and other entities
+                    float distance = Vector3.Distance(_cameraHandler.CurrentLockTarget.transform.position, _characterTransform.position);
+
+                    if (distance < 1.8f || _isStepping)
+                    {
+                        // TODO: move this after recovery when handled
+                        _isDashing = false;
+                        _dashFrameCount = 1;
+                        _isDashFrameCountStarted = false;
+                    }
                 }
+                // After recovery frames, reset dash
+                //else if (_isDashFrameCountStarted && _dashFrameCount > _dashStartupFrameNumber + _dashActiveFrameNumber + _dashRecoveryFrameNumber)
+                //{
+                    // TODO: ResetDash after no hurtbox collision
+                //}
+            }
+
+            // Increment frame count
+            if (_isDashFrameCountStarted)
+            {
+                _dashFrameCount += 1;
             }
         }
 
