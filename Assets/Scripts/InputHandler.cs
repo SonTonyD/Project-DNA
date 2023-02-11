@@ -30,6 +30,8 @@ namespace DNA
         private bool _aInput;
         [SerializeField]
         private bool _jumpFlag;
+        [SerializeField]
+        private bool _isJumpDisabled;
 
         [Header("Sprint")]
         [SerializeField]
@@ -41,9 +43,11 @@ namespace DNA
         [SerializeField]
         private bool _sprintFlag;
 
-        [Header("Guard and Step")]
+        [Header("Guard, Step and Dash")]
         [SerializeField]
         private bool _stepFlag;
+        [SerializeField]
+        private bool _dashFlag;
 
         [Header("Lock")]
         [SerializeField]
@@ -68,6 +72,7 @@ namespace DNA
         public bool JumpFlag { get => _jumpFlag; set => _jumpFlag = value; }
         public bool SprintFlag { get => _sprintFlag; set => _sprintFlag = value; }
         public bool StepFlag { get => _stepFlag; set => _stepFlag = value; }
+        public bool DashFlag { get => _dashFlag; set => _dashFlag = value; }
         public bool LockFlag { get => _lockFlag; set => _lockFlag = value; }
         public bool LockRightFlag { get => _lockRightFlag; set => _lockRightFlag = value; }
         public bool LockLeftFlag { get => _lockLeftFlag; set => _lockLeftFlag = value; }
@@ -103,10 +108,10 @@ namespace DNA
         public void HandleMovementInputs(float delta)
         {
             HandleMoveInput();
-            HandleJumpInput();
             HandleSprintInput();
             HandleLockInput(delta);
-            HandleGuardAndStepInput();
+            HandleGuardAndStepAndDashInput();
+            HandleJumpInput();
         }
 
         /// <summary>
@@ -141,7 +146,7 @@ namespace DNA
             _aInput = _inputActions.PlayerActions.Jump.triggered;
 
             // If the player has pushed the A button down, set the jump flag to true
-            if (_aInput)
+            if (_aInput && !_isJumpDisabled)
             {
                 _jumpFlag = true;
             }
@@ -251,12 +256,13 @@ namespace DNA
         /// <summary>
         /// Handles guard inputs and front, back, side step inputs
         /// </summary>
-        private void HandleGuardAndStepInput()
+        private void HandleGuardAndStepAndDashInput()
         {
             // If the player is pressing the right trigger and is moving the left stick, set the step flag to true and disable its movements
             if (_inputActions.PlayerActions.Guard.IsPressed())
             {
                 _isMoveDisabled = true;
+                _isJumpDisabled = true;
                 if (Mathf.Abs(_movementInput.x) + Mathf.Abs(_movementInput.y) > 0.0f)
                 {
                     _stepFlag = true;
@@ -265,11 +271,23 @@ namespace DNA
                 {
                     _stepFlag = false;
                 }
+
+                // If the player does not move the stick while holding the right trigger and push the jump button, set the dash flag to true
+                if (_aInput)
+                {
+                    _dashFlag = true;
+                }
+                else
+                {
+                    _dashFlag = false;
+                }
             }
             else
             {
                 _isMoveDisabled = false;
+                _isJumpDisabled = false;
                 _stepFlag = false;
+                _dashFlag = false;
             }
         }
     }

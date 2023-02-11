@@ -6,7 +6,7 @@ namespace DNA
     public class CameraHandler : MonoBehaviour
     {
         private InputHandler _inputHandler;
-        private Transform _characterTransform;
+        private Transform _cameraHolderTransform;
         private PlayerManager _playerManager;
         public static CameraHandler singleton;
 
@@ -77,9 +77,8 @@ namespace DNA
         private void Awake()
         {
             singleton = this;
-            _characterTransform = transform;
-            _cameraTransform.position = new Vector3(0, 0, -3.5f);
-            _cameraTransform.rotation = Quaternion.Euler(new Vector3(-10, 0, 0));
+            _cameraHolderTransform = transform;
+            _cameraTransform.SetPositionAndRotation(new Vector3(0, 0, -4f), Quaternion.Euler(new Vector3(-10, 0, 0)));
 
             _defaultPosition = _cameraTransform.localPosition.z;
             _ignoreLayers = ~(1 << 8 | 1 << 11 | 1 << 10);
@@ -99,8 +98,8 @@ namespace DNA
 
         public void FollowTarget(float delta)
         {
-            Vector3 targetPosition = Vector3.SmoothDamp(_characterTransform.position, _targetTransform.position, ref _cameraFollowVelocity, _followSpeed);
-            _characterTransform.position = targetPosition;
+            Vector3 targetPosition = Vector3.SmoothDamp(_cameraHolderTransform.position, _targetTransform.position, ref _cameraFollowVelocity, _followSpeed);
+            _cameraHolderTransform.position = targetPosition;
             HandleCameraCollisions();
         }
 
@@ -123,7 +122,7 @@ namespace DNA
                 Vector3 rotation = Vector3.zero;
                 rotation.y = _lookAngle;
                 Quaternion targetRotation = Quaternion.Euler(rotation);
-                _characterTransform.rotation = targetRotation;
+                _cameraHolderTransform.rotation = targetRotation;
 
                 rotation = Vector3.zero;
                 rotation.x = _pivotAngle;
@@ -156,7 +155,8 @@ namespace DNA
                     transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _switchLockTargetSpeed);
                 }
 
-                direction = _currentLockTarget.position - _cameraPivotTransform.position;
+                direction = new Vector3(_currentLockTarget.position.x, _currentLockTarget.position.y - 2.5f, _currentLockTarget.position.z) -
+                    transform.position;
                 direction.Normalize();
 
                 targetRotation = Quaternion.LookRotation(direction);
