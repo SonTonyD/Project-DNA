@@ -2,10 +2,8 @@ using UnityEngine;
 
 namespace DNA
 {
-    public class InputHandler : MonoBehaviour
+    public abstract class InputHandler : MonoBehaviour
     {
-        private PlayerControl _inputActions;
-
         [Header("Movements and Camera")]
         [SerializeField]
         protected CameraHandler _cameraHandler;
@@ -76,28 +74,7 @@ namespace DNA
         public bool IsMoveDisabled { get => _isMoveDisabled; set => _isMoveDisabled = value; }
 
 
-        private void Start()
-        {
-            _cameraHandler = FindObjectOfType<CameraHandler>();
-        }
-
-        public void OnEnable()
-        {
-            // Read stick and mouse inputs
-            if (_inputActions == null)
-            {
-                _inputActions = new PlayerControl();
-                _inputActions.PlayerMovement.Movement.performed += i => _movementInput = i.ReadValue<Vector2>();
-                _inputActions.PlayerMovement.Camera.performed += i => _cameraInput = i.ReadValue<Vector2>();
-            }
-
-            _inputActions.Enable();
-        }
-
-        public void OnDisable()
-        {
-            _inputActions.Disable();
-        }
+        
 
         /// <summary>
         /// Handles all movement inputs and sets up the correct movement flags for the Player Movement class
@@ -113,16 +90,30 @@ namespace DNA
             HandleAttackInput(delta);
         }
 
+        public abstract float GetHorizontalInput();
+        public abstract float GetVerticalInput();
+        public abstract bool GetAInput();
+        public abstract bool GetRsInput();
+        public abstract bool GetRsLeftInput();
+        public abstract bool GetRsRightInput();
+        public abstract bool GetGuardInput();
+        public abstract bool GetAttackInput();
+
+
+
+
+
+
         /// <summary>
         /// Handles forward, back, right, left movement inputs
         /// </summary>
-        private void HandleMoveInput()
+        protected void HandleMoveInput()
         {
             // Character movements if enabled
             if (!_isMoveDisabled)
             {
-                _horizontal = _movementInput.x;
-                _vertical = _movementInput.y;
+                _horizontal = GetHorizontalInput();
+                _vertical = GetVerticalInput();
                 _moveAmount = Mathf.Clamp01(Mathf.Abs(_horizontal) + Mathf.Abs(_vertical));
             }
             else
@@ -140,9 +131,9 @@ namespace DNA
         /// <summary>
         /// Handles jump inputs
         /// </summary>
-        private void HandleJumpInput()
+        protected void HandleJumpInput()
         {
-            _aInput = _inputActions.PlayerActions.Jump.triggered;
+            _aInput = GetAInput();
 
             // If the player has pushed the A button down, set the jump flag to true
             if (_aInput)
@@ -158,7 +149,7 @@ namespace DNA
         /// <summary>
         /// Handles sprint inputs when the player has run continuously for _SprintStartDuration seconds
         /// </summary>
-        private void HandleSprintInput()
+        protected void HandleSprintInput()
         {
             // If the move amount is 1 (running), start timer
             if (_moveAmount == 1 && !_isTimerStarted)
@@ -186,9 +177,9 @@ namespace DNA
         /// Handles lock and switch lock target inputs
         /// </summary>
         /// <param name="delta">Time between frames</param>
-        private void HandleLockInput(float delta)
+        protected void HandleLockInput(float delta)
         {
-            _rsInput = _inputActions.PlayerActions.Lock.triggered;
+            _rsInput = GetRsInput();
 
             // If the player has pushed the right stick down, set the lock flag to true
             if (_rsInput && !_lockFlag)
@@ -214,8 +205,8 @@ namespace DNA
                 _cameraHandler.ClearLockTargets();
             }
 
-            _rsLeftInput = _inputActions.PlayerMovement.LockLeft.triggered;
-            _rsRightInput = _inputActions.PlayerMovement.LockRight.triggered;
+            _rsLeftInput = GetRsLeftInput();
+            _rsRightInput = GetRsRightInput();
 
             // If the player is locking on a target and has moved the right stick to the left, set the lock left flag to true
             if (_lockFlag && _rsLeftInput)
@@ -255,10 +246,10 @@ namespace DNA
         /// <summary>
         /// Handles guard inputs and front, back, side step inputs
         /// </summary>
-        private void HandleGuardAndStepInput()
+        protected void HandleGuardAndStepInput()
         {
             // If the player is pressing the right trigger and is moving the left stick, set the step flag to true and disable its movements
-            if (_inputActions.PlayerActions.Guard.IsPressed())
+            if (GetGuardInput())
             {
                 _isMoveDisabled = true;
                 if (Mathf.Abs(_movementInput.x) + Mathf.Abs(_movementInput.y) > 0.0f)
@@ -278,9 +269,9 @@ namespace DNA
             }
         }
 
-        private void HandleAttackInput(float delta)
+        protected void HandleAttackInput(float delta)
         {
-            if (_inputActions.PlayerActions.Attack.triggered)
+            if (GetAttackInput())
             {
                 AttackFlag = true;
             }

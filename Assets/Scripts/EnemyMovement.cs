@@ -9,7 +9,7 @@ namespace DNA
         private void Start()
         {
             _controller = GetComponent<CharacterController>();
-            _enemyInputHandler = GetComponent<EnemyInputHandler>();
+            _inputHandler = GetComponent<InputHandler>();
             _animatorHandler = GetComponentInChildren<AnimatorHandler>();
             _playerAttacker = GetComponent<EnemyAttacker>();
             _characterTransform = transform;
@@ -20,14 +20,14 @@ namespace DNA
         public override Vector3 GetMoveDirection()
         {
             Vector3 moveDirection = new Vector3();
-            moveDirection = new Vector3(_enemyInputHandler.Horizontal, 0, _enemyInputHandler.Vertical);
+            moveDirection = new Vector3(_inputHandler.Horizontal, 0, _inputHandler.Vertical);
             return moveDirection;
         }
 
         public override Vector3 GetTargetDirection()
         {
             Vector3 targetDirection;
-            targetDirection = new Vector3(_enemyInputHandler.Horizontal, 0, _enemyInputHandler.Vertical);
+            targetDirection = new Vector3(_inputHandler.Horizontal, 0, _inputHandler.Vertical);
             return targetDirection;
         }
     }

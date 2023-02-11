@@ -6,10 +6,7 @@ namespace DNA
 {
     public class EnemyManager : CharacterManager
     {
-        private HitboxHandler _hitbox;
-        private EnemyInputHandler _enemyInputHandler;
         private Animator _animator;
-        private CameraHandler _cameraHandler;
         private EnemyMovement _enemyMovement;
 
         private const float _HeightComputeConstant = 0.15f;
@@ -23,7 +20,6 @@ namespace DNA
 
         private void Awake()
         {
-            _enemyInputHandler = GetComponent<EnemyInputHandler>();
             _animator = GetComponentInChildren<Animator>();
             _enemyMovement = GetComponent<EnemyMovement>();
 
