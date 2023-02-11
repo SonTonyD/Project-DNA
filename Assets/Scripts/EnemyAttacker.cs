@@ -3,10 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyAttacker : MonoBehaviour
+namespace DNA
 {
-    public void HandleLightAttack()
+    public class EnemyAttacker : PlayerAttacker
     {
-        throw new NotImplementedException();
+        public new void HandleLightAttack()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
+

@@ -8,57 +8,57 @@ namespace DNA
 
         [Header("Movements and Camera")]
         [SerializeField]
-        private CameraHandler _cameraHandler;
+        protected CameraHandler _cameraHandler;
         [SerializeField]
-        private float _horizontal;
+        protected float _horizontal;
         [SerializeField]
-        private float _vertical;
+        protected float _vertical;
         [SerializeField]
-        private float _moveAmount;
+        protected float _moveAmount;
         [SerializeField]
-        private float _mouseX;
+        protected float _mouseX;
         [SerializeField]
-        private float _mouseY;
+        protected float _mouseY;
         [SerializeField]
-        private bool _isMoveDisabled;
+        protected bool _isMoveDisabled;
 
-        private Vector2 _movementInput;
-        private Vector2 _cameraInput;
+        protected Vector2 _movementInput;
+        protected Vector2 _cameraInput;
 
         [Header("Jump")]
         [SerializeField]
-        private bool _aInput;
+        protected bool _aInput;
         [SerializeField]
-        private bool _jumpFlag;
-        private bool _attackFlag;
+        protected bool _jumpFlag;
+        protected bool _attackFlag;
 
         [Header("Sprint")]
         [SerializeField]
-        private bool _isTimerStarted;
+        protected bool _isTimerStarted;
         [SerializeField]
-        private float _walkStartTime;
+        protected float _walkStartTime;
         [SerializeField]
-        private const float _SprintStartDuration = 5f;
+        protected const float _SprintStartDuration = 5f;
         [SerializeField]
-        private bool _sprintFlag;
+        protected bool _sprintFlag;
 
         [Header("Guard and Step")]
         [SerializeField]
-        private bool _stepFlag;
+        protected bool _stepFlag;
 
         [Header("Lock")]
         [SerializeField]
-        private bool _rsInput;
+        protected bool _rsInput;
         [SerializeField]
-        private bool _rsRightInput;
+        protected bool _rsRightInput;
         [SerializeField]
-        private bool _rsLeftInput;
+        protected bool _rsLeftInput;
         [SerializeField]
-        private bool _lockFlag;
+        protected bool _lockFlag;
         [SerializeField]
-        private bool _lockRightFlag;
+        protected bool _lockRightFlag;
         [SerializeField]
-        private bool _lockLeftFlag;
+        protected bool _lockLeftFlag;
 
         public float Horizontal { get => _horizontal; set => _horizontal = value; }
         public float Vertical { get => _vertical; set => _vertical = value; }
