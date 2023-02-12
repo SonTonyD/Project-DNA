@@ -562,6 +562,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 519fc53d3e08c7640b816a9d92b868e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _lightAttack: {fileID: 0}
 --- !u!143 &87861661
 CharacterController:
   m_ObjectHideFlags: 0
@@ -592,15 +593,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb3220c1e2684574a962c564d424c3b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _cameraHandler: {fileID: 0}
   _horizontal: 0
   _vertical: 0
-  _jumpInput: 0
-  _guardInput: 0
-  _cameraHandler: {fileID: 0}
   _moveAmount: 0
   _mouseX: 0
   _mouseY: 0
   _isMoveDisabled: 0
+  _aInput: 0
+  _jumpFlag: 0
   _isTimerStarted: 0
   _walkStartTime: 0
   _sprintFlag: 0
@@ -611,6 +612,11 @@ MonoBehaviour:
   _lockFlag: 0
   _lockRightFlag: 0
   _lockLeftFlag: 0
+  _moveX: 0
+  _moveZ: 0
+  _jumpInput: 0
+  _guardInput: 0
+  _attackInput: 0
 --- !u!114 &87861663
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -623,7 +629,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bde09f303a8acc44c945e5d5b00d447e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enemyInputHandler: {fileID: 0}
+  _cameraObject: {fileID: 0}
+  _inputHandler: {fileID: 0}
+  _normalCamera: {fileID: 0}
   _controller: {fileID: 0}
   _movementSpeed: 8
   _rotationSpeed: 10
@@ -929,7 +937,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 206747144}
-  - component: {fileID: 206747141}
   - component: {fileID: 206747146}
   - component: {fileID: 206747140}
   - component: {fileID: 206747145}
@@ -937,6 +944,7 @@ GameObject:
   - component: {fileID: 206747148}
   - component: {fileID: 206747149}
   - component: {fileID: 206747150}
+  - component: {fileID: 206747151}
   m_Layer: 10
   m_Name: Player
   m_TagString: Untagged
@@ -978,37 +986,6 @@ MonoBehaviour:
   _isStepping: 0
   _stepPower: 5
   _stepDuration: 0.25
---- !u!114 &206747141
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 206747139}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e57a9df935f0aa34d927612791049ae0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cameraHandler: {fileID: 0}
-  _horizontal: 0
-  _vertical: 0
-  _moveAmount: 0
-  _mouseX: 0
-  _mouseY: 0
-  _isMoveDisabled: 0
-  _aInput: 0
-  _jumpFlag: 0
-  _isTimerStarted: 0
-  _walkStartTime: 0
-  _sprintFlag: 0
-  _stepFlag: 0
-  _rsInput: 0
-  _rsRightInput: 0
-  _rsLeftInput: 0
-  _lockFlag: 0
-  _lockRightFlag: 0
-  _lockLeftFlag: 0
 --- !u!4 &206747144
 Transform:
   m_ObjectHideFlags: 0
@@ -1113,6 +1090,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _lightAttack: {fileID: 11400000, guid: 3deeccba8385c9f4389a44ba3812dbae, type: 2}
+--- !u!114 &206747151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206747139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7672a28a7524eee44a93bc5b53aec725, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cameraHandler: {fileID: 471761263}
+  _horizontal: 0
+  _vertical: 0
+  _moveAmount: 0
+  _mouseX: 0
+  _mouseY: 0
+  _isMoveDisabled: 0
+  _aInput: 0
+  _jumpFlag: 0
+  _isTimerStarted: 0
+  _walkStartTime: 0
+  _sprintFlag: 0
+  _stepFlag: 0
+  _rsInput: 0
+  _rsRightInput: 0
+  _rsLeftInput: 0
+  _lockFlag: 0
+  _lockRightFlag: 0
+  _lockLeftFlag: 0
 --- !u!1 &220026472
 GameObject:
   m_ObjectHideFlags: 0
