@@ -40,13 +40,10 @@ namespace DNA
 
         void OnTriggerEnter(Collider other)
         {
-            if ((_enemyLayer.value & 1 << other.gameObject.layer) != 0)
+            HurtboxManager hurtboxManager = other.gameObject.GetComponent<HurtboxManager>();
+            if (hurtboxManager != null)
             {
-                Hurtbox hurtbox = other.gameObject.GetComponent<Hurtbox>();
-                if (hurtbox != null && hurtbox.HurtboxManager != null)
-                {
-                    hurtbox.HurtboxManager.TakeDamage(_damage, _counter, _activeFrames);
-                }
+                hurtboxManager.TakeDamage(_damage, _counter, _activeFrames);
             }
         }
 
