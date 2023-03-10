@@ -20,16 +20,19 @@ namespace DNA
         private const string _JumpString = "Jump";
         private const string _GroundedString = "Grounded";
         private const string _StepString = "Step";
+        private const string _AttackString = "Attack";
 
         private int _animatorJumpID;
         private int _animatorGroundedID;
         private int _animatorStepID;
+        private int _animatorAttackID;
 
         public Animator Animator { get => _animator; set => _animator = value; }
         public bool IsRotationEnabled { get => _isRotationEnabled; set => _isRotationEnabled = value; }
         public string JumpString => _JumpString;
         public string StepString => _StepString;
         public string GroundedString => _GroundedString;
+        public string AttackString => _AttackString;
 
 
         public void Initialize()
@@ -43,6 +46,7 @@ namespace DNA
             _animatorJumpID = Animator.StringToHash("Jump");
             _animatorGroundedID = Animator.StringToHash("Grounded");
             _animatorStepID = Animator.StringToHash("Step");
+            _animatorAttackID = Animator.StringToHash("Attack");
         }
 
         /// <summary>
@@ -67,6 +71,11 @@ namespace DNA
                     Debug.Log("No matching animation");
                     break;
             }
+        }
+
+        public void TriggerState(string stateName) 
+        {
+            _animator.Play(stateName);
         }
 
         /// <summary>

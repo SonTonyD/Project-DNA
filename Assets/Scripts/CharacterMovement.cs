@@ -253,6 +253,7 @@ namespace DNA
             if (_inputHandler.AttackFlag)
             {
                 _playerAttacker.HandleLightAttack();
+                _animatorHandler.TriggerState("Punching");
             }
         }
 
