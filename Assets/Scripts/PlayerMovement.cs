@@ -100,7 +100,7 @@ namespace DNA
         [SerializeField]
         public bool _isDashFrameCountStarted = false;
 
-        public const float _DashPowerMultiplier = 100f;
+        public readonly float _DashPowerMultiplier = 100f;
 
         public CharacterController Controller { get => _controller; set => _controller = value; }
     }
@@ -150,62 +150,6 @@ namespace DNA
         }
 
         #region Movement
-
-        /// <summary>
-        /// Makes the character do a homing dash
-        /// </summary>
-        /// <param name="delta">Time between frames</param>
-        public void HandleDash(float delta)
-        {
-            if ((_inputHandler.DashFlag && _cameraHandler.CurrentLockTarget != null) ||
-                _isDashing ||
-                _isDashFrameCountStarted)
-            {
-                // Start count for startup
-                if (!_isDashFrameCountStarted)
-                {
-                    _isStepping = false;
-                    _isDashFrameCountStarted = true;
-                }
-                // After startup
-                else if (_isDashFrameCountStarted && _dashFrameCount > _dashStartupFrameNumber &&
-                    _dashFrameCount > _dashStartupFrameNumber /*<= _dashStartupFrameNumber + _dashActiveFrameNumber + _dashRecoveryFrameNumber*/)
-                {
-                    Vector3 _moveDirection = (_cameraHandler.CurrentLockTarget.transform.position - _characterTransform.position).normalized;
-
-                    if (_isGrounded)
-                    {
-                        _moveDirection.y = -0.15f;
-                    }
-
-                    _dashVelocity = Mathf.Sqrt(_dashPower * _DashPowerMultiplier) * _moveDirection.normalized;
-
-                    _isDashing = true;
-
-                    // Stop homing dash when near lock target => TODO: replace by collider collision with floor, wall and other entities
-                    float distance = Vector3.Distance(_cameraHandler.CurrentLockTarget.transform.position, _characterTransform.position);
-
-                    if (distance < 1.8f || _isStepping)
-                    {
-                        // TODO: move this after recovery when handled
-                        _isDashing = false;
-                        _dashFrameCount = 1;
-                        _isDashFrameCountStarted = false;
-                    }
-                }
-                // After recovery frames, reset dash
-                //else if (_isDashFrameCountStarted && _dashFrameCount > _dashStartupFrameNumber + _dashActiveFrameNumber + _dashRecoveryFrameNumber)
-                //{
-                    // TODO: ResetDash after no hurtbox collision
-                //}
-            }
-
-            // Increment frame count
-            if (_isDashFrameCountStarted)
-            {
-                _dashFrameCount += 1;
-            }
-        }
 
         /// <summary>
         /// Checks if the character is grounded
