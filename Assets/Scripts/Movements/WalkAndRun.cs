@@ -22,7 +22,7 @@ namespace DNA
         /// Moves the character forward, back, right, left
         /// </summary>
         /// <param name="delta">Time between frames</param>
-        public void HandleMovements(float delta)
+        public void HandleWalkAndRun(float delta)
         {
             _movementData._inputHandler.HandleMovementInputs(delta);
 
