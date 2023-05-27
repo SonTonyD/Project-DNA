@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace DNA
@@ -7,6 +8,16 @@ namespace DNA
     public class Jump : MonoBehaviour
     {
         private PlayerMovementData _movementData;
+        private PlayerMovement _playerMovement;
+        private string _scriptableObjectPath;
+
+        private void Start()
+        {
+            _playerMovement = GetComponentInParent<PlayerMovement>();
+            _scriptableObjectPath = _playerMovement.getPlayerMovementDataPath();
+            _movementData = AssetDatabase.LoadAssetAtPath<PlayerMovementData>(_scriptableObjectPath);
+        }
+
 
         /// <summary>
         /// Makes the character do a jump

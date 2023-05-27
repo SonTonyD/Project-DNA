@@ -44,11 +44,12 @@ namespace DNA
             }
 
             // Character control and movements
-            _playerMovement.HandleGroundedCheck();
-            _playerMovement.Step.HandleStep(delta);
-            _playerMovement.Dash.HandleDash(delta);
-            _playerMovement.Jump.HandleJump(delta);
-            _playerMovement.WalkAndRun.HandleMovements(delta);
+
+            _playerMovement.groundCheck.HandleGroundedCheck();
+            _playerMovement.step.HandleStep(delta);
+            _playerMovement.dash.HandleDash(delta);
+            _playerMovement.jump.HandleJump(delta);
+            _playerMovement.walkAndRun.HandleMovements(delta);
         }
 
         /// <summary>
