@@ -79,10 +79,10 @@ namespace DNA
         [SerializeField]
         public Vector2 _currentStepMovementInput;
 
-        public const float _StepPowerMultiplier = 100f;
-        public const float _OrthogonalStepInputThreshold = 0.9f;
-        public const float _AntiSpiralConstant = 0.0425f;
-        public const float _MinimalStepMovementInput = 0.5f;
+        public readonly float _StepPowerMultiplier = 100f;
+        public readonly float _OrthogonalStepInputThreshold = 0.9f;
+        public readonly float _AntiSpiralConstant = 0.0425f;
+        public readonly float _MinimalStepMovementInput = 0.5f;
 
         [Header("Dash Variables")]
         [SerializeField]
@@ -150,47 +150,6 @@ namespace DNA
         }
 
         #region Movement
-
-        /// <summary>
-        /// Makes the character do a jump
-        /// </summary>
-        /// <param name="delta">Time between frames</param>
-        public void HandleJump(float delta)
-        {
-            _animatorHandler.PlayAnimation(_animatorHandler.GroundedString, _isGrounded);
-            _animatorHandler.PlayAnimation(_animatorHandler.JumpString, false);
-
-            // If the jump flag is true and the character is grounded, make the character jump
-            if (_inputHandler.JumpFlag && _isGrounded && !_isStepping && !_isDashing)
-            {
-                _didSecondJump = false;
-                _animatorHandler.PlayAnimation(_animatorHandler.JumpString, true);
-                _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
-            }
-            // If the jump flag is true and the character is in air and did not do a second jump, make the character jump
-            else if (_inputHandler.JumpFlag && !_isGrounded && !_didSecondJump && !_isStepping && !_isDashing)
-            {
-                _didSecondJump = true;
-                _animatorHandler.PlayAnimation(_animatorHandler.JumpString, true);
-                _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
-            }
-
-            // If the character is grounded, fix the character to the ground
-            if (_isGrounded)
-            {
-                _didSecondJump = false;
-                if (_verticalVelocity < 0)
-                {
-                    _verticalVelocity = -2f;
-                }
-            }
-
-            // Apply gravity by reducing the character vertical velocity if it has vertical velocity
-            if (_verticalVelocity < _terminalVelocity)
-            {
-                _verticalVelocity += _gravity * delta;
-            }
-        }
 
         /// <summary>
         /// Makes the character do a front, back, side step
