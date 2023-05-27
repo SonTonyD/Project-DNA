@@ -665,6 +665,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ab3e6b093a403441b5df5efd60d846c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _movementData: {fileID: 0}
+  walkAndRun: {fileID: 0}
+  jump: {fileID: 0}
+  step: {fileID: 0}
+  dash: {fileID: 0}
+  groundCheck: {fileID: 0}
 --- !u!114 &206747141
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -49,7 +49,7 @@ namespace DNA
             _playerMovement.step.HandleStep(delta);
             _playerMovement.dash.HandleDash(delta);
             _playerMovement.jump.HandleJump(delta);
-            _playerMovement.walkAndRun.HandleWalkAndRun(delta);
+            _playerMovement.walkAndRun.HandleMovements(delta);
         }
 
         /// <summary>
