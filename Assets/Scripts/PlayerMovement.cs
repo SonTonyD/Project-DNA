@@ -2,243 +2,154 @@ using UnityEngine;
 
 namespace DNA
 {
-    public class PlayerMovement : MonoBehaviour
+    [CreateAssetMenu(fileName = "PlayerMovementData", menuName = "Data/Player Movement Data")]
+    public class PlayerMovementData : ScriptableObject
     {
         [Header("References")]
         [SerializeField]
-        private Transform _cameraObject;
+        public Transform _cameraObject;
         [SerializeField]
-        private InputHandler _inputHandler;
+        public InputHandler _inputHandler;
         [HideInInspector]
-        private Transform _characterTransform;
+        public Transform _characterTransform;
         [HideInInspector]
-        private AnimatorHandler _animatorHandler;
+        public AnimatorHandler _animatorHandler;
         [SerializeField]
-        private GameObject _normalCamera;
+        public GameObject _normalCamera;
         [SerializeField]
-        private CharacterController _controller;
+        public CharacterController _controller;
         [SerializeField]
-        private CameraHandler _cameraHandler;
+        public CameraHandler _cameraHandler;
 
-        private Vector3 _moveDirection;
+        public Vector3 _moveDirection;
 
         [Header("Movement Variables")]
         [SerializeField]
-        private float _movementSpeed = 8.0f;
+        public float _movementSpeed = 8.0f;
         [SerializeField]
-        private float _rotationSpeed = 15.0f;
+        public float _rotationSpeed = 15.0f;
         [SerializeField]
-        private float _jumpHeight = 2f;
+        public float _jumpHeight = 2f;
         [SerializeField]
-        private float _gravity = -15.0f;
+        public float _gravity = -15.0f;
         [SerializeField]
-        private float _sprintSpeed = 12.0f;
+        public float _sprintSpeed = 12.0f;
         [SerializeField]
-        private float _speedModulation = 0f;
+        public float _speedModulation = 0f;
 
-        private const float _DiagonalInputThreshold = 0.5f;
-        private const float _OrthogonalInputThreshold = 0.85f;
-        private const float _MinimalSpeedModulation = 0.15f;
+        public readonly float _DiagonalInputThreshold = 0.5f;
+        public readonly float _OrthogonalInputThreshold = 0.85f;
+        public readonly float _MinimalSpeedModulation = 0.15f;
 
         [Header("Jump Variables")]
         [SerializeField]
-        private bool _isGrounded;
+        public bool _isGrounded;
         [SerializeField]
-        private LayerMask _groundLayers;
+        public LayerMask _groundLayers;
         [SerializeField]
-        private float _groundedOffset = -0.08f;
+        public float _groundedOffset = -0.08f;
         [SerializeField]
-        private bool _didSecondJump = false;
+        public bool _didSecondJump = false;
         [SerializeField]
-        private float _verticalVelocity;
+        public float _verticalVelocity;
         [SerializeField]
-        private float _terminalVelocity = 50.0f;
+        public float _terminalVelocity = 50.0f;
 
         [Header("Step Variables")]
         [SerializeField]
-        private Vector3 _horizontalVelocity = Vector3.zero;
+        public Vector3 _horizontalVelocity = Vector3.zero;
         [SerializeField]
-        private bool _isStepping = false;
+        public bool _isStepping = false;
         [SerializeField]
-        private float _stepPower = 5f;
+        public float _stepPower = 5f;
         [SerializeField]
-        private int _stepStartupFrameNumber = 4;
+        public int _stepStartupFrameNumber = 4;
         [SerializeField]
-        private int _stepActiveFrameNumber = 15;
+        public int _stepActiveFrameNumber = 15;
         [SerializeField]
-        private int _stepRecoveryFrameNumber = 10;
+        public int _stepRecoveryFrameNumber = 10;
         [SerializeField]
-        private bool _isRecoveringFromStep = false;
+        public bool _isRecoveringFromStep = false;
         [SerializeField]
-        private int _stepFrameCount = 1;
+        public int _stepFrameCount = 1;
         [SerializeField]
-        private bool _isStepFrameCountStarted = false;
+        public bool _isStepFrameCountStarted = false;
         [SerializeField]
-        private Vector2 _stepMovementInput;
+        public Vector2 _stepMovementInput;
         [SerializeField]
-        private Vector2 _currentStepMovementInput;
+        public Vector2 _currentStepMovementInput;
 
-        private const float _StepPowerMultiplier = 100f;
-        private const float _OrthogonalStepInputThreshold = 0.9f;
-        private const float _AntiSpiralConstant = 0.0425f;
-        private const float _MinimalStepMovementInput = 0.5f;
+        public const float _StepPowerMultiplier = 100f;
+        public const float _OrthogonalStepInputThreshold = 0.9f;
+        public const float _AntiSpiralConstant = 0.0425f;
+        public const float _MinimalStepMovementInput = 0.5f;
 
         [Header("Dash Variables")]
         [SerializeField]
-        private bool _isDashing = false;
+        public bool _isDashing = false;
         [SerializeField]
-        private Vector3 _dashVelocity = Vector3.zero;
+        public Vector3 _dashVelocity = Vector3.zero;
         [SerializeField]
-        private float _dashPower = 6f;
+        public float _dashPower = 6f;
         [SerializeField]
-        private int _dashStartupFrameNumber = 8;
+        public int _dashStartupFrameNumber = 8;
         //[SerializeField]
         //private int _dashRecoveryFrameNumber = 20;
         [SerializeField]
-        private int _dashFrameCount = 1;
+        public int _dashFrameCount = 1;
         [SerializeField]
-        private bool _isDashFrameCountStarted = false;
+        public bool _isDashFrameCountStarted = false;
 
-        private const float _DashPowerMultiplier = 100f;
+        public const float _DashPowerMultiplier = 100f;
 
         public CharacterController Controller { get => _controller; set => _controller = value; }
+    }
 
+    public class PlayerMovement : MonoBehaviour
+    {
+        private PlayerMovementData _movementData;
+
+        [Header("Movement References")]
+        private WalkAndRun _walkAndRun;
+        private Jump _jump;
+        private Step _step;
+        private Dash _dash;
+        private GroundCheck _groundCheck;
+
+        public WalkAndRun WalkAndRun { get => _walkAndRun; set => _walkAndRun = value; }
+        public Jump Jump { get => _jump; set => _jump = value; }
+        public Step Step { get => _step; set => _step = value; }
+        public Dash Dash { get => _dash; set => _dash = value; }
+        public GroundCheck GroundCheck { get => _groundCheck; set => _groundCheck = value; }
 
         private void Start()
         {
-            _controller = GetComponent<CharacterController>();
-            _inputHandler = GetComponent<InputHandler>();
-            _animatorHandler = GetComponentInChildren<AnimatorHandler>();
-            _cameraObject = Camera.main.transform;
-            _cameraHandler = CameraHandler.singleton;
-            _characterTransform = transform;
-            _animatorHandler.Initialize();
-            _groundLayers = LayerMask.GetMask("Floor");
+            SetMovementDataReferences();
+            GetMovementReferences();
+        }
+
+        private void SetMovementDataReferences()
+        {
+            _movementData._controller = GetComponent<CharacterController>();
+            _movementData._inputHandler = GetComponent<InputHandler>();
+            _movementData._animatorHandler = GetComponentInChildren<AnimatorHandler>();
+            _movementData._cameraObject = Camera.main.transform;
+            _movementData._cameraHandler = CameraHandler.singleton;
+            _movementData._characterTransform = transform;
+            _movementData._animatorHandler.Initialize();
+            _movementData._groundLayers = LayerMask.GetMask("Floor");
+        }
+
+        private void GetMovementReferences()
+        {
+            _walkAndRun = GetComponentInChildren<WalkAndRun>();
+            _jump = GetComponentInChildren<Jump>();
+            _step = GetComponentInChildren<Step>();
+            _dash = GetComponentInChildren<Dash>();
+            _groundCheck = GetComponentInChildren<GroundCheck>();
         }
 
         #region Movement
-
-        /// <summary>
-        /// Handles character rotation
-        /// </summary>
-        /// <param name="delta">Time between frames</param>
-        private void HandleRotation(float delta)
-        {
-            Vector3 targetDirection;
-
-            if (_cameraHandler.CurrentLockTarget == null && _isStepping)
-            {
-                return;
-            }
-
-            if (_cameraHandler.CurrentLockTarget == null)
-            {
-                targetDirection = _cameraObject.forward * _inputHandler.Vertical;
-                targetDirection += _cameraObject.right * _inputHandler.Horizontal;
-            }
-            else if (_isStepping)
-            {
-                targetDirection = (_cameraHandler.CurrentLockTarget.transform.position - transform.position);
-                Vector3 perpendicularVector = Vector3.Cross(targetDirection, Vector3.up);
-                targetDirection += -perpendicularVector * _inputHandler.Horizontal;
-            }
-            else if (_isDashing)
-            {
-                targetDirection = (_cameraHandler.CurrentLockTarget.transform.position - transform.position);
-            }
-            else
-            {
-                targetDirection = (_cameraHandler.CurrentLockTarget.transform.position - transform.position);
-                Vector3 perpendicularVector = Vector3.Cross(targetDirection, Vector3.up);
-                targetDirection *= _inputHandler.Vertical;
-                targetDirection += -perpendicularVector * _inputHandler.Horizontal;
-            }
-            
-            targetDirection.Normalize();
-            targetDirection.y = 0;
-
-            if (targetDirection == Vector3.zero)
-            {
-                targetDirection = _characterTransform.forward;
-            }
-
-            Quaternion lookRotation = Quaternion.LookRotation(targetDirection);
-            Quaternion targetRotation = Quaternion.Slerp(_characterTransform.rotation, lookRotation, _rotationSpeed * delta);
-
-            _characterTransform.rotation = targetRotation;
-        }
-
-        /// <summary>
-        /// Moves the character forward, back, right, left
-        /// </summary>
-        /// <param name="delta">Time between frames</param>
-        public void HandleMovements(float delta)
-        {
-            _inputHandler.HandleMovementInputs(delta);
-            
-            if (_cameraHandler.CurrentLockTarget == null)
-            {
-                _moveDirection = _cameraObject.forward * _inputHandler.Vertical;
-                _moveDirection += _cameraObject.right * _inputHandler.Horizontal;
-            }
-            else
-            {
-                Vector3 targetDirection = (_cameraHandler.CurrentLockTarget.transform.position - transform.position).normalized;
-                Vector3 perpendicularVector = Vector3.Cross(targetDirection, Vector3.up);
-                _moveDirection = targetDirection * _inputHandler.Vertical;
-                _moveDirection += -perpendicularVector * _inputHandler.Horizontal;
-            }
-
-            _moveDirection.Normalize();
-            _moveDirection.y = 0;
-
-            float speed = _movementSpeed;
-
-            // If the player is moving the left stick at more than 85% of the maximum in any direction, set the speed modulation to 1 (maximal value)
-            if ((Mathf.Abs(_inputHandler.Vertical) > _DiagonalInputThreshold && Mathf.Abs(_inputHandler.Horizontal) > _DiagonalInputThreshold) ||
-                Mathf.Max(Mathf.Abs(_inputHandler.Vertical), Mathf.Abs(_inputHandler.Horizontal)) > _OrthogonalInputThreshold)
-            {
-                _speedModulation = 1;
-            }
-            else
-            {
-                _speedModulation = Mathf.Max(Mathf.Abs(_inputHandler.Vertical), Mathf.Abs(_inputHandler.Horizontal));
-            }
-
-            // Set minimal speed modulation to 0.15
-            _speedModulation = Mathf.Max(_speedModulation, _MinimalSpeedModulation);
-
-            // If the character is sprinting, set the speed modulation to 1 (maximal value)
-            if (_inputHandler.SprintFlag)
-            {
-                speed = _sprintSpeed;
-                _speedModulation = 1;
-            }
-
-            _moveDirection *= speed;
-
-            // Move the character vertically and/or horizontally
-            if (_isStepping)
-            {
-                _controller.Move(new Vector3(_horizontalVelocity.x, _verticalVelocity, _horizontalVelocity.z) * delta);
-            }
-            if (_isDashing)
-            {
-                _controller.Move(_dashVelocity * delta);
-            }
-            else
-            {
-                _controller.Move(_moveDirection.normalized * (speed * _speedModulation * delta) + new Vector3(0.0f, _verticalVelocity, 0.0f) * delta);
-            }
-
-            _animatorHandler.UpdateAnimatorMovementValues(_inputHandler.MoveAmount, 0);
-
-            // Rotate character in the correct direction if rotation is enabled and is not stepping
-            if (_animatorHandler.IsRotationEnabled)
-            {
-                HandleRotation(delta);
-            }
-        }
 
         /// <summary>
         /// Makes the character do a jump

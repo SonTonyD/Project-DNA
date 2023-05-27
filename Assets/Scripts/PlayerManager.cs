@@ -48,7 +48,7 @@ namespace DNA
             _playerMovement.HandleStep(delta);
             _playerMovement.HandleDash(delta);
             _playerMovement.HandleJump(delta);
-            _playerMovement.HandleMovements(delta);
+            _playerMovement.WalkAndRun.HandleMovements(delta);
         }
 
         /// <summary>
