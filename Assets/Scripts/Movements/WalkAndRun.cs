@@ -72,11 +72,13 @@ namespace DNA
             {
                 _movementData._controller.Move(new Vector3(_movementData._horizontalVelocity.x, _movementData._verticalVelocity, _movementData._horizontalVelocity.z) * delta);
             }
+            
             if (_movementData._isDashing)
             {
                 _movementData._controller.Move(_movementData._dashVelocity * delta);
             }
-            else
+
+            if (!_movementData._isStepping && !_movementData._isDashing)
             {
                 _movementData._controller.Move(_movementData._moveDirection.normalized * (speed * _movementData._speedModulation * delta) + new Vector3(0.0f, _movementData._verticalVelocity, 0.0f) * delta);
             }
