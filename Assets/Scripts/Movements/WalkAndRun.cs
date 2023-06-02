@@ -114,7 +114,7 @@ namespace DNA
             {
                 targetDirection = (_movementData._cameraHandler.CurrentLockTarget.transform.position - transform.position);
                 Vector3 perpendicularVector = Vector3.Cross(targetDirection, Vector3.up);
-                targetDirection += -perpendicularVector * _movementData._inputHandler.Horizontal;
+                targetDirection += -perpendicularVector * _movementData._stepInitialHorizontalValue;
             }
             else if (_movementData._isDashing)
             {

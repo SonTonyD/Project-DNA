@@ -80,6 +80,7 @@ namespace DNA
         public Vector2 _stepMovementInput;
         [SerializeField]
         public Vector2 _currentStepMovementInput;
+        public float _stepInitialHorizontalValue;
 
         public readonly float _StepPowerMultiplier = 100f;
         public readonly float _OrthogonalStepInputThreshold = 0.9f;
