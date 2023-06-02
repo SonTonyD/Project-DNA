@@ -149,6 +149,7 @@ namespace DNA
                 {
                     _movementData._isDashing = false;
                     _movementData._isStepping = true;
+                    _movementData._stepInitialHorizontalValue = _movementData._inputHandler.Horizontal;
                     _movementData._animatorHandler.PlayAnimation(_movementData._animatorHandler.StepString, true);
                 }
             }
