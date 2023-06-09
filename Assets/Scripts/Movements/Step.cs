@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace DNA
 {
-    public class Step : MonoBehaviour
+    public class Step : FrameAction
     {
         private PlayerMovementData _movementData;
         private PlayerMovement _playerMovement;
@@ -24,48 +24,81 @@ namespace DNA
         /// <param name="delta">Time between frames</param>
         public void HandleStep(float delta)
         {
-            if ((_movementData._inputHandler.StepFlag && !_movementData._isStepping) ||
-                (_movementData._isStepping && _movementData._cameraHandler.CurrentLockTarget != null) ||
-                (_movementData._isStepping && _movementData._isRecoveringFromStep) ||
-                (_movementData._isStepFrameCountStarted))
+            actionCondition = (_movementData._inputHandler.StepFlag &&
+                                        !_movementData._isStepping) ||
+                                    (_movementData._isStepping &&
+                                        _movementData._cameraHandler.CurrentLockTarget != null) ||
+                                    (_movementData._isStepping && 
+                                        _movementData._isRecoveringFromStep) ||
+                                    (_movementData._isStepFrameCountStarted);
+
+            SetFrameConditions(
+                _movementData._isStepFrameCountStarted,
+                _movementData._stepFrameCount,
+                _movementData._stepStartupFrameNumber,
+                _movementData._stepActiveFrameNumber,
+                _movementData._stepRecoveryFrameNumber
+            );
+
+            ExecuteFrameAction();
+        }
+
+        #region FrameAction functions
+
+        override protected void ExecuteStartup()
+        {
+            _movementData._stepMovementInput = _movementData._inputHandler.MovementInput;
+
+            // If movement input too low, do not step
+            if (Mathf.Abs(_movementData._stepMovementInput.x) + Mathf.Abs(_movementData._stepMovementInput.y) > _movementData._MinimalStepMovementInput)
             {
-                // Start count for startup
-                if (!_movementData._isStepFrameCountStarted)
-                {
-                    _movementData._stepMovementInput = _movementData._inputHandler.MovementInput;
-
-                    // If movement input too low, do not step
-                    if (Mathf.Abs(_movementData._stepMovementInput.x) + Mathf.Abs(_movementData._stepMovementInput.y) > _movementData._MinimalStepMovementInput)
-                    {
-                        _movementData._isStepFrameCountStarted = true;
-                    }
-                }
-                // After startup
-                else if (_movementData._isStepFrameCountStarted && _movementData._stepFrameCount > _movementData._stepStartupFrameNumber &&
-                    _movementData._stepFrameCount <= _movementData._stepStartupFrameNumber + _movementData._stepActiveFrameNumber + _movementData._stepRecoveryFrameNumber)
-                {
-                    // Set recovery bool after active frames
-                    if (!_movementData._isRecoveringFromStep && _movementData._stepFrameCount > _movementData._stepStartupFrameNumber + _movementData._stepActiveFrameNumber)
-                    {
-                        _movementData._isRecoveringFromStep = true;
-                    }
-
-                    SetStepMoveDirection();
-                    ExecuteStep();
-                }
-                // After recovery frames, reset step
-                else if (_movementData._isStepFrameCountStarted && _movementData._stepFrameCount > _movementData._stepStartupFrameNumber + _movementData._stepActiveFrameNumber + _movementData._stepRecoveryFrameNumber)
-                {
-                    ResetStep();
-                }
+                _movementData._isStepFrameCountStarted = true;
             }
+        }
 
+        override protected void ExecuteActive()
+        {
+            SetStepMoveDirection();
+            ExecuteStep();
+        }
+
+        override protected void ExecuteRecovery()
+        {
+            _movementData._isRecoveringFromStep = true;
+            SetStepMoveDirection();
+            ExecuteStep();
+        }
+
+        /// <summary>
+        /// Resets front, back, side step variables to authorize another step
+        /// </summary>
+        override protected void ExecuteReset()
+        {
+            _movementData._stepFrameCount = 1;
+            _movementData._isStepFrameCountStarted = false;
+            _movementData._animatorHandler.PlayAnimation(_movementData._animatorHandler.StepString, false);
+            _movementData._horizontalVelocity = Vector3.zero;
+            _movementData._stepMovementInput = Vector2.zero;
+            _movementData._currentStepMovementInput = Vector2.zero;
+            _movementData._isStepFrameCountStarted = false;
+            _movementData._isRecoveringFromStep = false;
+            _movementData._isStepping = false;
+            _movementData._isStepMoveDirectionSet = false;
+            _movementData._stepRecoverySlowDownMultiplier = 1f;
+        }
+
+        protected override void IncrementFrameCount()
+        {
             // Increment frame count
             if (_movementData._isStepFrameCountStarted)
             {
                 _movementData._stepFrameCount += 1;
             }
         }
+
+        #endregion
+
+        #region Support functions
 
         /// <summary>
         /// Computes and sets/updates the step move direction
@@ -85,8 +118,16 @@ namespace DNA
             // Set step direction
             if (_movementData._cameraHandler.CurrentLockTarget == null)
             {
-                _movementData._moveDirection = _movementData._cameraObject.forward * _movementData._stepMovementInput.y;
-                _movementData._moveDirection += _movementData._cameraObject.right * _movementData._stepMovementInput.x;
+                if (!_movementData._isStepMoveDirectionSet)
+                {
+                    _movementData._currentStepCameraForwardValue = _movementData._cameraObject.forward;
+                    _movementData._currentStepCameraRightValue = _movementData._cameraObject.right;
+                    _movementData._isStepMoveDirectionSet = true;
+                }
+
+                _movementData._moveDirection = _movementData._currentStepCameraForwardValue * _movementData._stepMovementInput.y;
+                _movementData._moveDirection += _movementData._currentStepCameraRightValue * _movementData._stepMovementInput.x;
+
             }
             // Step when locking
             else
@@ -141,7 +182,8 @@ namespace DNA
                 }
                 else
                 {
-                    _movementData._horizontalVelocity = Mathf.Sqrt(_movementData._stepPower / 2 * _movementData._StepPowerMultiplier) * _movementData._moveDirection.normalized;
+                    _movementData._horizontalVelocity = Mathf.Sqrt((_movementData._stepPower / (2 * _movementData._stepRecoverySlowDownMultiplier)) * _movementData._StepPowerMultiplier) * _movementData._moveDirection.normalized;
+                    _movementData._stepRecoverySlowDownMultiplier += 0.25f;
                 }
 
                 // Start step
@@ -149,27 +191,13 @@ namespace DNA
                 {
                     _movementData._isDashing = false;
                     _movementData._isStepping = true;
-                    _movementData._stepInitialHorizontalValue = _movementData._inputHandler.Horizontal;
+                    _movementData._currentStepHorizontalValue = _movementData._inputHandler.Horizontal;
                     _movementData._animatorHandler.PlayAnimation(_movementData._animatorHandler.StepString, true);
                 }
             }
         }
 
-        /// <summary>
-        /// Resets front, back, side step variables to authorize another step
-        /// </summary>
-        private void ResetStep()
-        {
-            _movementData._stepFrameCount = 1;
-            _movementData._isStepFrameCountStarted = false;
-            _movementData._animatorHandler.PlayAnimation(_movementData._animatorHandler.StepString, false);
-            _movementData._horizontalVelocity = Vector3.zero;
-            _movementData._stepMovementInput = Vector2.zero;
-            _movementData._currentStepMovementInput = Vector2.zero;
-            _movementData._isStepFrameCountStarted = false;
-            _movementData._isRecoveringFromStep = false;
-            _movementData._isStepping = false;
-        }
+        #endregion
     }
 }
 
