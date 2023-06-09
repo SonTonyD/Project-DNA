@@ -22,7 +22,7 @@ namespace DNA
         /// Makes the character do a front, back, side step
         /// </summary>
         /// <param name="delta">Time between frames</param>
-        public void HandleStep(float delta)
+        public void HandleStep()
         {
             actionCondition = (_movementData._inputHandler.StepFlag &&
                                         !_movementData._isStepping) ||

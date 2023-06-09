@@ -50,7 +50,8 @@ namespace DNA
                 {
                     ExecuteRecovery();
                 }
-                else if (resetCondition) {
+                else if (resetCondition)
+                {
                     ExecuteReset();
                 }
             }
