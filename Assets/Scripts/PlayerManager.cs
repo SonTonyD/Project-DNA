@@ -46,8 +46,8 @@ namespace DNA
             // Character control and movements
 
             _playerMovement.groundCheck.HandleGroundedCheck();
-            _playerMovement.step.HandleStep(delta);
-            _playerMovement.dash.HandleDash(delta);
+            _playerMovement.step.HandleStep();
+            _playerMovement.dash.HandleDash();
             _playerMovement.jump.HandleJump(delta);
             _playerMovement.walkAndRun.HandleMovements(delta);
         }

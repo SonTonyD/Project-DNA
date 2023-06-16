@@ -63,13 +63,13 @@ namespace DNA
         [SerializeField]
         public bool _isStepping = false;
         [SerializeField]
-        public float _stepPower = 5f;
+        public float _stepPower = 10f;
         [SerializeField]
         public int _stepStartupFrameNumber = 4;
         [SerializeField]
-        public int _stepActiveFrameNumber = 15;
+        public int _stepActiveFrameNumber = 16;
         [SerializeField]
-        public int _stepRecoveryFrameNumber = 10;
+        public int _stepRecoveryFrameNumber = 40;
         [SerializeField]
         public bool _isRecoveringFromStep = false;
         [SerializeField]
@@ -80,7 +80,12 @@ namespace DNA
         public Vector2 _stepMovementInput;
         [SerializeField]
         public Vector2 _currentStepMovementInput;
-        public float _stepInitialHorizontalValue;
+
+        public float _currentStepHorizontalValue;
+        public bool _isStepMoveDirectionSet = false;
+        public Vector3 _currentStepCameraForwardValue;
+        public Vector3 _currentStepCameraRightValue;
+        public float _stepRecoverySlowDownMultiplier = 1f;
 
         public readonly float _StepPowerMultiplier = 100f;
         public readonly float _OrthogonalStepInputThreshold = 0.9f;
